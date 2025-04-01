@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name:       WP Simple Pay Styles
- * Plugin URI:        https://example.com/plugins/wp-simple-pay-styles/
+ * Plugin URI:        https://ajohnlea.com/plugins/wp-simple-pay-styles/
  * Description:       Customize the appearance of WP Simple Pay on-site forms.
  * Version:           1.0.0
  * Author:            Your Name Here
  * Author URI:        https://example.com/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       ajl-wp-simple-pay-styles
+ * Text Domain:       wp-simple-pay-styles
  * Domain Path:       /languages
  */
 
