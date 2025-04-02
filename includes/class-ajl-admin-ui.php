@@ -118,6 +118,8 @@ class AJL_Admin_UI {
 		foreach ( $style_keys as $key ) {
 			$value = AJL_Settings::get_setting( $post_id, $key );
 			$label = ucwords( str_replace( '_', ' ', $key ) ); // Simple label generation
+			$label = ( $key === 'background_color' ) ? 'Input Background Color' : $label; // Clarify Input BG
+			$label = ( $key === 'form_container_background_color' ) ? 'Form Background Color' : $label; // Better Label
 
 			echo '<tr>';
 			echo '<th scope="row"><label for="ajl_wpsps_' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label></th>';
@@ -126,7 +128,8 @@ class AJL_Admin_UI {
 			// Render different field types based on the key
 			switch ( $key ) {
 				case 'primary_color':
-				case 'background_color':
+				case 'background_color': // Input background
+				case 'form_container_background_color': // Form background
 				case 'text_color':
 				case 'button_background_color':
 				case 'button_text_color':
@@ -232,7 +235,8 @@ class AJL_Admin_UI {
 					$sanitized_value = '';
 					switch ( $key ) {
 						case 'primary_color':
-						case 'background_color':
+						case 'background_color': // Input background
+						case 'form_container_background_color': // Form background
 						case 'text_color':
 						case 'button_background_color':
 						case 'button_text_color':

@@ -186,6 +186,7 @@ class AJL_Frontend {
 		}
 
 		$css = "";
+		$preview_css = ""; // Separate CSS for preview wrapper
 
 		foreach ( self::$rendered_form_ids as $form_id ) {
 			$display_type = get_post_meta( $form_id, '_form_display_type', true );
@@ -194,94 +195,204 @@ class AJL_Frontend {
 			}
 
 			$form_selector_prefix = "#simpay-form-{$form_id} ";
-			$input_selector_base = "#simpay-form-{$form_id} .simpay-form-control ";
+			$control_selector_base = "#simpay-form-{$form_id} .simpay-form-control ";
+			$field_wrap_selector_base = "#simpay-form-{$form_id} .simpay-field-wrap ";
+			$live_wrapper_selector = "#simpay-embedded-form-wrap-{$form_id}"; // Target the outer wrapper div by ID
 
 			// --- Generate CSS --- 
-			$background_color = AJL_Settings::get_setting( $form_id, 'background_color' );
-			if ( $background_color ) {
-				$css .= "{$input_selector_base}input[type=\"text\"],
-                         {$input_selector_base}input[type=\"email\"],
-                         {$input_selector_base}input[type=\"tel\"],
-                         {$input_selector_base}input[type=\"number\"],
-                         {$input_selector_base}select,
-                         {$input_selector_base}textarea
-                         { background-color: " . esc_attr( $background_color ) . " !important; }\n";
+			// Form Container Background Color & Padding
+			$form_bg_color = AJL_Settings::get_setting( $form_id, 'form_container_background_color' );
+			if ( $form_bg_color ) {
+				// Apply background, padding, border-radius, max-width, and centering to the specific live wrapper ID
+				$css .= "{$live_wrapper_selector} { 
+					background-color: " . esc_attr( $form_bg_color ) . " !important; 
+					padding: 30px !important; 
+					border-radius: 4px !important; 
+					max-width: 460px !important; 
+					margin: 0 auto !important; 
+				}\n"; 
+				// Apply background only to preview wrapper
+				$preview_css .= "body.simpay-form-preview .simpay-form-preview-wrap { background: " . esc_attr( $form_bg_color ) . " !important; }\n";
+			}
+
+			// Input Background Color
+			$input_bg_color = AJL_Settings::get_setting( $form_id, 'background_color' );
+			if ( $input_bg_color ) {
+				$css .= "{$control_selector_base}input[type=\"text\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"email\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"tel\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"number\"],
+";
+				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
+";
+				$css .= "                         {$control_selector_base}select,
+";
+				$css .= "                         {$field_wrap_selector_base}textarea
+";
+				$css .= "                         { background-color: " . esc_attr( $input_bg_color ) . " !important; }\n";
 			}
 
 			$text_color = AJL_Settings::get_setting( $form_id, 'text_color' );
 			if ( $text_color ) {
 				$css .= "{$form_selector_prefix}.simpay-label,
-                         {$form_selector_prefix}label,
-                         {$input_selector_base}input[type=\"text\"],
-                         {$input_selector_base}input[type=\"email\"],
-                         {$input_selector_base}input[type=\"tel\"],
-                         {$input_selector_base}input[type=\"number\"],
-                         {$input_selector_base}select,
-                         {$input_selector_base}textarea,
-                         {$form_selector_prefix}.simpay-total-amount
-                         { color: " . esc_attr( $text_color ) . " !important; }\n";
+";
+				$css .= "                         {$form_selector_prefix}label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label,
+";
+				$css .= "                         {$control_selector_base}input[type=\"text\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"email\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"tel\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"number\"],
+";
+				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
+";
+				$css .= "                         {$control_selector_base}select,
+";
+				$css .= "                         {$field_wrap_selector_base}textarea,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-radio-wrap label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-checkbox-wrap label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-total-amount,
+";
+				$css .= "                         {$form_selector_prefix}h1, {$form_selector_prefix}h2, {$form_selector_prefix}h3, {$form_selector_prefix}h4, {$form_selector_prefix}h5, {$form_selector_prefix}h6
+";
+				$css .= "                         { color: " . esc_attr( $text_color ) . " !important; }\n";
 			}
 
 			$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius' );
 			if ( $border_radius !== '' ) {
-				$css .= "{$input_selector_base}input[type=\"text\"],
-                         {$input_selector_base}input[type=\"email\"],
-                         {$input_selector_base}input[type=\"tel\"],
-                         {$input_selector_base}input[type=\"number\"],
-                         {$input_selector_base}input[type=\"radio\"],
-                         {$input_selector_base}input[type=\"checkbox\"],
-                         {$input_selector_base}select,
-                         {$input_selector_base}textarea,
-                         {$form_selector_prefix}.simpay-checkout-btn
-                         { border-radius: " . esc_attr( $border_radius ) . "px !important; }\n";
+				// Target inputs/selects/textarea/radio/checkbox within controls/wraps, and BOTH buttons
+				$css .= "{$control_selector_base}input[type=\"text\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"email\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"tel\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"number\"],
+";
+				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"radio\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"checkbox\"],
+";
+				$css .= "                         {$control_selector_base}select,
+";
+				$css .= "                         {$field_wrap_selector_base}textarea,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-checkout-btn, 
+"; 
+				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon /* Correct coupon button class */
+"; 
+				$css .= "                         { border-radius: " . esc_attr( $border_radius ) . "px !important; }\n";
 			}
 
 			$label_font_size = AJL_Settings::get_setting( $form_id, 'label_font_size' );
 			if ( $label_font_size ) {
 				$css .= "{$form_selector_prefix}.simpay-label,
-                         {$form_selector_prefix}label
-                         { font-size: " . esc_attr( $label_font_size ) . "px !important; }\n";
+";
+				$css .= "                         {$form_selector_prefix}label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label
+";
+				$css .= "                         { font-size: " . esc_attr( $label_font_size ) . "px !important; }\n";
 			}
 
 			$label_font_weight = AJL_Settings::get_setting( $form_id, 'label_font_weight' );
 			if ( $label_font_weight ) {
 				$css .= "{$form_selector_prefix}.simpay-label,
-                         {$form_selector_prefix}label
-                         { font-weight: " . esc_attr( $label_font_weight ) . " !important; }\n";
+";
+				$css .= "                         {$form_selector_prefix}label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label
+";
+				$css .= "                         { font-weight: " . esc_attr( $label_font_weight ) . " !important; }\n";
 			}
 
 			$input_font_size = AJL_Settings::get_setting( $form_id, 'input_font_size' );
 			if ( $input_font_size ) {
-				$css .= "{$input_selector_base}input[type=\"text\"],
-                         {$input_selector_base}input[type=\"email\"],
-                         {$input_selector_base}input[type=\"tel\"],
-                         {$input_selector_base}input[type=\"number\"],
-                         {$input_selector_base}select,
-                         {$input_selector_base}textarea
-                         { font-size: " . esc_attr( $input_font_size ) . "px !important; }\n";
+				$css .= "{$control_selector_base}input[type=\"text\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"email\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"tel\"],
+";
+				$css .= "                         {$control_selector_base}input[type=\"number\"],
+";
+				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
+";
+				$css .= "                         {$control_selector_base}select,
+";
+				$css .= "                         {$field_wrap_selector_base}textarea
+";
+				$css .= "                         { font-size: " . esc_attr( $input_font_size ) . "px !important; }\n";
 			}
 
+			// --- Button Styles --- Apply to both buttons
 			$button_bg = AJL_Settings::get_setting( $form_id, 'button_background_color' );
 			if ( $button_bg ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn { background-color: " . esc_attr( $button_bg ) . " !important; border-color: " . esc_attr( $button_bg ) . " !important; }\n";
+				$css .= "{$form_selector_prefix}.simpay-checkout-btn,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon
+";
+				$css .= "                         { background-color: " . esc_attr( $button_bg ) . " !important; border-color: " . esc_attr( $button_bg ) . " !important; }\n";
 			}
 
 			$button_text = AJL_Settings::get_setting( $form_id, 'button_text_color' );
 			if ( $button_text ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn { color: " . esc_attr( $button_text ) . " !important; }\n";
+				$css .= "{$form_selector_prefix}.simpay-checkout-btn,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon
+";
+				$css .= "                         { color: " . esc_attr( $button_text ) . " !important; }\n";
 			}
 
 			$button_hover_bg = AJL_Settings::get_setting( $form_id, 'button_hover_background_color' );
 			if ( $button_hover_bg ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn:hover { background-color: " . esc_attr( $button_hover_bg ) . " !important; border-color: " . esc_attr( $button_hover_bg ) . " !important; }\n";
+				$css .= "{$form_selector_prefix}.simpay-checkout-btn:hover,
+";
+				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon:hover
+";
+				$css .= "                         { background-color: " . esc_attr( $button_hover_bg ) . " !important; border-color: " . esc_attr( $button_hover_bg ) . " !important; }\n";
 			}
 			// --- End Generate CSS ---
 		}
 
-		if ( ! empty( $css ) ) {
+		// Combine live CSS and preview CSS
+		$final_css = $preview_css . $css;
+
+		// Output the combined CSS
+		if ( ! empty( $final_css ) ) {
 			// Directly print the CSS in the footer
 			echo "\n<style id=\"ajl-wpsps-inline-styles-late\">\n";
-			echo $css; // WPCS: XSS okay. CSS is generated from sanitized settings.
+			echo $final_css; // WPCS: XSS okay.
 			echo "</style>\n";
 		}
 	}

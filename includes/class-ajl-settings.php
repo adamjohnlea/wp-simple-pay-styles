@@ -106,15 +106,14 @@ class AJL_Settings {
 	}
 
 	/**
-	 * Get all defined style keys.
+	 * Get all available style keys.
 	 *
-	 * @since 1.0.0
-	 * @return array List of style keys.
+	 * @return array
 	 */
 	public static function get_style_keys() {
 		return [
 			'primary_color',
-			'background_color',
+			'background_color', // Input background
 			'text_color',
 			'border_radius',
 			'button_background_color',
@@ -123,6 +122,7 @@ class AJL_Settings {
 			'label_font_size',
 			'label_font_weight',
 			'input_font_size',
+			'form_container_background_color', // New setting
 		];
 	}
 
