@@ -116,6 +116,16 @@
             // Text color
             updateColorPicker('#ajl_wpsps_text_color', themeSettings.text_color);
             
+            // Label text color (if set)
+            if (themeSettings.label_text_color) {
+                updateColorPicker('#ajl_wpsps_label_text_color', themeSettings.label_text_color);
+            }
+            
+            // Input text color (if set)
+            if (themeSettings.input_text_color) {
+                updateColorPicker('#ajl_wpsps_input_text_color', themeSettings.input_text_color);
+            }
+            
             // Primary color
             updateColorPicker('#ajl_wpsps_primary_color', themeSettings.primary_color);
             
@@ -159,11 +169,13 @@
             form_container_background_color: '#ffffff',
             background_color: '#ffffff',
             text_color: '#32325d',
+            label_text_color: '', // Will inherit from text_color if empty
+            input_text_color: '', // Will inherit from text_color if empty
             primary_color: '#0f8569',
             button_background_color: '#0f8569',
             button_text_color: '#ffffff',
             button_hover_background_color: '#0e7c62',
-            border_radius: 0,
+            border_radius: 3, // Default should be 3px
             label_font_size: 14,
             input_font_size: 16,
             label_font_weight: 'normal'
@@ -181,6 +193,15 @@
             button_hover_background_color: theme.colors.secondary
         };
         
+        // Set specific colors for specific themes
+        if (themeId === 'midnight' || themeId === 'monochrome') {
+            // For dark themes, ensure input text is visible on dark backgrounds
+            if (theme.colors.background.toLowerCase() === '#34495e' || 
+                theme.colors.background.toLowerCase() === '#2c3e50') {
+                themeSettings.input_text_color = '#ffffff'; // White text for dark backgrounds
+            }
+        }
+        
         // Add theme-specific layout values
         switch (themeId) {
             case 'midnight':
@@ -197,6 +218,9 @@
                 break;
             case 'minimal':
                 themeSettings.border_radius = 2; // Subtle roundness
+                break;
+            case 'default':
+                themeSettings.border_radius = 3; // Default roundness
                 break;
             default:
                 themeSettings.border_radius = 3; // Default roundness

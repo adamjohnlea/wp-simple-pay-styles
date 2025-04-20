@@ -122,6 +122,9 @@ class AJL_Settings {
 			'form_container_background_color',
 			'background_color',
 			'text_color',
+			'label_text_color',
+			'input_text_color',
+			'border_color',
 			'primary_color',
 			'button_background_color',
 			'button_text_color',
@@ -152,6 +155,41 @@ class AJL_Settings {
 	 */
 	public static function setting_exists( $post_id, $key ) {
 		return metadata_exists( 'post', $post_id, self::$meta_prefix . sanitize_key( $key ) );
+	}
+
+	/**
+	 * Sanitize a setting value.
+	 *
+	 * @param string $key   Setting key.
+	 * @param mixed  $value Setting value.
+	 *
+	 * @return mixed Sanitized setting value.
+	 */
+	public static function sanitize_setting( $key, $value ) {
+		switch ( $key ) {
+			case 'selected_theme':
+				return sanitize_text_field( $value );
+			case 'form_container_background_color':
+			case 'background_color':
+			case 'text_color':
+			case 'label_text_color':
+			case 'input_text_color':
+			case 'border_color':
+			case 'primary_color':
+			case 'button_background_color':
+			case 'button_text_color':
+			case 'button_hover_background_color':
+				return sanitize_hex_color( $value );
+			case 'border_radius':
+			case 'label_font_size':
+			case 'input_font_size':
+				return absint( $value );
+			case 'label_font_weight':
+				$allowed_values = array( 'normal', 'bold', '100', '200', '300', '400', '500', '600', '700', '800', '900' );
+				return in_array( $value, $allowed_values, true ) ? $value : 'normal';
+			default:
+				return $value;
+		}
 	}
 
 } 

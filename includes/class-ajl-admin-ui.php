@@ -125,6 +125,23 @@ class AJL_Admin_UI {
 	}
 
 	/**
+	 * Check if this is a new form without any saved style settings
+	 *
+	 * @param int $post_id The post ID to check
+	 * @return bool True if this is a new form, false otherwise
+	 */
+	private function is_new_form( $post_id ) {
+		// Check if any style settings exist for this form
+		foreach ( AJL_Settings::get_style_keys() as $key ) {
+			if ( AJL_Settings::setting_exists( $post_id, $key ) ) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	/**
 	 * Renders the style settings within the WP Simple Pay 'General' tab.
 	 *
 	 * @param int $post_id The post ID.
@@ -138,6 +155,9 @@ class AJL_Admin_UI {
 			echo '<hr><p><i>' . esc_html__( 'WP Simple Pay Styles: Styling is only available for On-Site (Embedded/Overlay) forms.', 'ajl-wp-simple-pay-styles' ) . '</i></p>';
 			return;
 		}
+
+		// Determine if this is a new form
+		$is_new_form = $this->is_new_form( $post_id );
 
 		// Add a section heading
 		echo '<hr><h3>' . esc_html__( 'Form Styles (WP Simple Pay Styles)', 'ajl-wp-simple-pay-styles' ) . '</h3>';
@@ -372,7 +392,7 @@ class AJL_Admin_UI {
 								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Input', 'ajl-wp-simple-pay-styles' ); ?></div>
 							</div>
 							<p class="ajl-wpsps-field-description">
-								<?php esc_html_e( 'Background color of input fields', 'ajl-wp-simple-pay-styles' ); ?>
+								<?php esc_html_e( 'Background color of input fields, selects, and dropdowns', 'ajl-wp-simple-pay-styles' ); ?>
 							</p>
 						</div>
 
@@ -392,7 +412,47 @@ class AJL_Admin_UI {
 								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Text', 'ajl-wp-simple-pay-styles' ); ?></div>
 							</div>
 							<p class="ajl-wpsps-field-description">
-								<?php esc_html_e( 'Color for labels and input text', 'ajl-wp-simple-pay-styles' ); ?>
+								<?php esc_html_e( 'Color for labels, inputs, dropdown text and options', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+
+						<!-- Label Text Color (New) -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_label_text_color">
+								<?php esc_html_e( 'Label Text Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_label_text_color" 
+									name="ajl_wpsps[label_text_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'label_text_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Labels', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Color specifically for field labels (overrides Text Color for labels)', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+
+						<!-- Input Text Color (New) -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_input_text_color">
+								<?php esc_html_e( 'Input Text Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_input_text_color" 
+									name="ajl_wpsps[input_text_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'input_text_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Input Text', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Color specifically for text in input fields (overrides Text Color for inputs)', 'ajl-wp-simple-pay-styles' ); ?>
 							</p>
 						</div>
 
@@ -412,7 +472,28 @@ class AJL_Admin_UI {
 								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Accent', 'ajl-wp-simple-pay-styles' ); ?></div>
 							</div>
 							<p class="ajl-wpsps-field-description">
-								<?php esc_html_e( 'Used for focus states and highlights', 'ajl-wp-simple-pay-styles' ); ?>
+								<?php esc_html_e( 'Used for focus states, highlights, and links', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+
+						<!-- Border Color (New) -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_border_color">
+								<?php esc_html_e( 'Border Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_border_color" 
+									name="ajl_wpsps[border_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_color' ) ); ?>" 
+									class="ajl-color-picker"
+									data-alpha-enabled="true"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Border', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Border color for input fields and elements', 'ajl-wp-simple-pay-styles' ); ?>
 							</p>
 						</div>
 					</div>
@@ -514,13 +595,13 @@ class AJL_Admin_UI {
 									type="number" 
 									id="ajl_wpsps_border_radius" 
 									name="ajl_wpsps[border_radius]" 
-									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>" 
+									value="<?php echo esc_attr( $is_new_form ? 3 : AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>" 
 									step="1"
 								/>
 								<span class="ajl-wpsps-unit">px</span>
 							</div>
 							<div class="ajl-wpsps-radius-preview">
-								<div class="ajl-wpsps-radius-box" style="border-radius: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>px;"></div>
+								<div class="ajl-wpsps-radius-box" style="border-radius: <?php echo esc_attr( $is_new_form ? 3 : AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>px;"></div>
 							</div>
 							<p class="ajl-wpsps-field-description">
 								<?php esc_html_e( 'Rounded corners for inputs and buttons', 'ajl-wp-simple-pay-styles' ); ?>
@@ -545,7 +626,7 @@ class AJL_Admin_UI {
 									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color' ) ); ?>" 
 									class="ajl-color-picker"
 								/>
-								<div class="ajl-wpsps-button-preview" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color', '#0f8569' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+								<div class="ajl-wpsps-button-preview" style="background-color: <?php echo esc_attr( $is_new_form ? '#0f8569' : AJL_Settings::get_setting( $post_id, 'button_background_color', '#0f8569' ) ); ?>; color: <?php echo esc_attr( $is_new_form ? '#ffffff' : AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
 									<?php esc_html_e( 'Button Preview', 'ajl-wp-simple-pay-styles' ); ?>
 								</div>
 							</div>
@@ -580,7 +661,7 @@ class AJL_Admin_UI {
 									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color' ) ); ?>" 
 									class="ajl-color-picker"
 								/>
-								<div class="ajl-wpsps-button-preview ajl-wpsps-button-hover" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color', '#0e7c62' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+								<div class="ajl-wpsps-button-preview ajl-wpsps-button-hover" style="background-color: <?php echo esc_attr( $is_new_form ? '#0e7c62' : AJL_Settings::get_setting( $post_id, 'button_hover_background_color', '#0e7c62' ) ); ?>; color: <?php echo esc_attr( $is_new_form ? '#ffffff' : AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
 									<?php esc_html_e( 'Hover Preview', 'ajl-wp-simple-pay-styles' ); ?>
 								</div>
 							</div>
@@ -700,5 +781,59 @@ class AJL_Admin_UI {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Render style settings tab template.
+	 */
+	public function get_style_settings_tab_template() {
+		ob_start();
+		?>
+		<div class="simpay-panel-setting-row">
+			<h3>
+				<?php esc_html_e( 'Form Styles', 'wp-simple-pay-styles' ); ?>
+			</h3>
+		</div>
+		<div class="simpay-panel-section" id="ajl-form-styles-tabs">
+			<ul class="wp-tab-bar">
+				<li class="wp-tab-active">
+					<a href="#colors-tab"><?php esc_html_e( 'Colors', 'wp-simple-pay-styles' ); ?></a>
+				</li>
+				<li>
+					<a href="#fonts-tab"><?php esc_html_e( 'Typography', 'wp-simple-pay-styles' ); ?></a>
+				</li>
+				<li>
+					<a href="#buttons-tab"><?php esc_html_e( 'Button Styles', 'wp-simple-pay-styles' ); ?></a>
+				</li>
+			</ul>
+			<div id="colors-tab" class="wp-tab-panel">
+				<div class="simpay-panel-setting">
+					<label for="ajl_background_color"><?php esc_html_e( 'Form Background', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_background_color" name="_simpay_custom_form[ajl_background_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'background_color', 'form-styles' ) ); ?>" data-default-color="#ffffff" data-alpha="true" />
+				</div>
+				<div class="simpay-panel-setting">
+					<label for="ajl_text_color"><?php esc_html_e( 'Text Color', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_text_color" name="_simpay_custom_form[ajl_text_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'text_color', 'form-styles' ) ); ?>" data-default-color="#000000" />
+				</div>
+				<div class="simpay-panel-setting">
+					<label for="ajl_label_text_color"><?php esc_html_e( 'Label Text Color', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_label_text_color" name="_simpay_custom_form[ajl_label_text_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'label_text_color', 'form-styles' ) ); ?>" data-default-color="#000000" />
+				</div>
+				<div class="simpay-panel-setting">
+					<label for="ajl_input_text_color"><?php esc_html_e( 'Input Text Color', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_input_text_color" name="_simpay_custom_form[ajl_input_text_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'input_text_color', 'form-styles' ) ); ?>" data-default-color="#32325d" />
+				</div>
+				<div class="simpay-panel-setting">
+					<label for="ajl_border_color"><?php esc_html_e( 'Border Color', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_border_color" name="_simpay_custom_form[ajl_border_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'border_color', 'form-styles' ) ); ?>" data-default-color="#e6e6e6" />
+				</div>
+				<div class="simpay-panel-setting">
+					<label for="ajl_primary_color"><?php esc_html_e( 'Primary Color', 'wp-simple-pay-styles' ); ?></label>
+					<input type="text" id="ajl_primary_color" name="_simpay_custom_form[ajl_primary_color]" class="ajl-color-picker" value="<?php echo esc_attr( AJL_Settings::get_setting( 'primary_color', 'form-styles' ) ); ?>" data-default-color="#0f8569" />
+				</div>
+			</div>
+			<!-- ... Remaining code unchanged ... -->
+		<?php
+		return ob_get_clean();
 	}
 } 
