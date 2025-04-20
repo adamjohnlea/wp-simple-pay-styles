@@ -187,6 +187,19 @@ class AJL_Frontend {
 
 		$css = "";
 		$preview_css = ""; // Separate CSS for preview wrapper
+		
+		// Add global button reset for all forms to override WP Simple Pay defaults
+		$css .= "
+		/* Reset button border radius to 0px by default to override WP Simple Pay's 4px default */
+		body .simpay-form-wrap .simpay-payment-btn,
+		body .simpay-form .simpay-checkout-btn,
+		body .simpay-form .simpay-apply-coupon,
+		body .simpay-form button.simpay-payment-btn,
+		body .simpay-form button.simpay-checkout-btn,
+		body .simpay-form button.simpay-apply-coupon {
+			border-radius: 0px !important;
+		}
+		";
 
 		foreach ( self::$rendered_form_ids as $form_id ) {
 			$display_type = get_post_meta( $form_id, '_form_display_type', true );
@@ -194,195 +207,26 @@ class AJL_Frontend {
 				continue;
 			}
 
+			// Get the base CSS from our generator method
+			$form_css = $this->generate_custom_css($form_id);
+			$css .= $form_css;
+
+			// Add legacy CSS selectors for backwards compatibility
 			$form_selector_prefix = "#simpay-form-{$form_id} ";
-			$control_selector_base = "#simpay-form-{$form_id} .simpay-form-control ";
-			$field_wrap_selector_base = "#simpay-form-{$form_id} .simpay-field-wrap ";
 			$live_wrapper_selector = "#simpay-embedded-form-wrap-{$form_id}"; // Target the outer wrapper div by ID
 
-			// --- Generate CSS --- 
-			// Form Container Background Color & Padding
+			// --- Form Container Background Color & Padding
 			$form_bg_color = AJL_Settings::get_setting( $form_id, 'form_container_background_color' );
 			if ( $form_bg_color ) {
-				// Apply background, padding, border-radius, max-width, and centering to the specific live wrapper ID
+				// Apply background to the specific live wrapper ID (no padding)
 				$css .= "{$live_wrapper_selector} { 
 					background-color: " . esc_attr( $form_bg_color ) . " !important; 
-					padding: 30px !important; 
-					border-radius: 4px !important; 
-					max-width: 460px !important; 
+					border-radius: 0 !important; 
 					margin: 0 auto !important; 
 				}\n"; 
 				// Apply background only to preview wrapper
 				$preview_css .= "body.simpay-form-preview .simpay-form-preview-wrap { background: " . esc_attr( $form_bg_color ) . " !important; }\n";
 			}
-
-			// Input Background Color
-			$input_bg_color = AJL_Settings::get_setting( $form_id, 'background_color' );
-			if ( $input_bg_color ) {
-				$css .= "{$control_selector_base}input[type=\"text\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"email\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"tel\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"number\"],
-";
-				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
-";
-				$css .= "                         {$control_selector_base}select,
-";
-				$css .= "                         {$field_wrap_selector_base}textarea
-";
-				$css .= "                         { background-color: " . esc_attr( $input_bg_color ) . " !important; }\n";
-			}
-
-			$text_color = AJL_Settings::get_setting( $form_id, 'text_color' );
-			if ( $text_color ) {
-				$css .= "{$form_selector_prefix}.simpay-label,
-";
-				$css .= "                         {$form_selector_prefix}label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label,
-";
-				$css .= "                         {$control_selector_base}input[type=\"text\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"email\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"tel\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"number\"],
-";
-				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
-";
-				$css .= "                         {$control_selector_base}select,
-";
-				$css .= "                         {$field_wrap_selector_base}textarea,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-radio-wrap label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-checkbox-wrap label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-total-amount,
-";
-				$css .= "                         {$form_selector_prefix}h1, {$form_selector_prefix}h2, {$form_selector_prefix}h3, {$form_selector_prefix}h4, {$form_selector_prefix}h5, {$form_selector_prefix}h6
-";
-				$css .= "                         { color: " . esc_attr( $text_color ) . " !important; }\n";
-			}
-
-			$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius' );
-			if ( $border_radius !== '' ) {
-				// Target inputs/selects/textarea/radio/checkbox within controls/wraps, and BOTH buttons
-				$css .= "{$control_selector_base}input[type=\"text\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"email\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"tel\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"number\"],
-";
-				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"radio\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"checkbox\"],
-";
-				$css .= "                         {$control_selector_base}select,
-";
-				$css .= "                         {$field_wrap_selector_base}textarea,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-checkout-btn, 
-"; 
-				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon /* Correct coupon button class */
-"; 
-				$css .= "                         { border-radius: " . esc_attr( $border_radius ) . "px !important; }\n";
-			}
-
-			$label_font_size = AJL_Settings::get_setting( $form_id, 'label_font_size' );
-			if ( $label_font_size ) {
-				$css .= "{$form_selector_prefix}.simpay-label,
-";
-				$css .= "                         {$form_selector_prefix}label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label
-";
-				$css .= "                         { font-size: " . esc_attr( $label_font_size ) . "px !important; }\n";
-			}
-
-			$label_font_weight = AJL_Settings::get_setting( $form_id, 'label_font_weight' );
-			if ( $label_font_weight ) {
-				$css .= "{$form_selector_prefix}.simpay-label,
-";
-				$css .= "                         {$form_selector_prefix}label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-radio-label legend,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-total-amount-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-billing-container-label,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-address-shipping-container-label
-";
-				$css .= "                         { font-weight: " . esc_attr( $label_font_weight ) . " !important; }\n";
-			}
-
-			$input_font_size = AJL_Settings::get_setting( $form_id, 'input_font_size' );
-			if ( $input_font_size ) {
-				$css .= "{$control_selector_base}input[type=\"text\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"email\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"tel\"],
-";
-				$css .= "                         {$control_selector_base}input[type=\"number\"],
-";
-				$css .= "                         {$field_wrap_selector_base}input[type=\"date\"],
-";
-				$css .= "                         {$control_selector_base}select,
-";
-				$css .= "                         {$field_wrap_selector_base}textarea
-";
-				$css .= "                         { font-size: " . esc_attr( $input_font_size ) . "px !important; }\n";
-			}
-
-			// --- Button Styles --- Apply to both buttons
-			$button_bg = AJL_Settings::get_setting( $form_id, 'button_background_color' );
-			if ( $button_bg ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon
-";
-				$css .= "                         { background-color: " . esc_attr( $button_bg ) . " !important; border-color: " . esc_attr( $button_bg ) . " !important; }\n";
-			}
-
-			$button_text = AJL_Settings::get_setting( $form_id, 'button_text_color' );
-			if ( $button_text ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon
-";
-				$css .= "                         { color: " . esc_attr( $button_text ) . " !important; }\n";
-			}
-
-			$button_hover_bg = AJL_Settings::get_setting( $form_id, 'button_hover_background_color' );
-			if ( $button_hover_bg ) {
-				$css .= "{$form_selector_prefix}.simpay-checkout-btn:hover,
-";
-				$css .= "                         {$form_selector_prefix}.simpay-apply-coupon:hover
-";
-				$css .= "                         { background-color: " . esc_attr( $button_hover_bg ) . " !important; border-color: " . esc_attr( $button_hover_bg ) . " !important; }\n";
-			}
-			// --- End Generate CSS ---
 		}
 
 		// Combine live CSS and preview CSS
@@ -416,4 +260,125 @@ class AJL_Frontend {
         $opacity = max( 0, min( 1, $opacity ) );
         return sprintf( 'rgba(%d,%d,%d,%.2f)', $r, $g, $b, $opacity );
     }
+
+	/**
+	 * Generate the custom CSS for a form based on its style settings.
+	 *
+	 * @param int $form_id The form ID.
+	 * @return string The generated CSS.
+	 */
+	private function generate_custom_css( $form_id ) {
+		$css = '';
+
+		// Only add container width to make sure the form doesn't get squeezed
+		$css .= "
+		/* Form container width */
+		#simpay-embedded-form-wrap-{$form_id} {
+			max-width: none !important;
+		}";
+		
+		// Now add the theme-specific styles
+		// Add form container background color
+		$form_bg_color = AJL_Settings::get_setting( $form_id, 'form_container_background_color' );
+		if ( ! empty( $form_bg_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] { background-color: {$form_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} { background-color: {$form_bg_color} !important; }\n";
+		}
+
+		// Add form background color (input fields)
+		$bg_color = AJL_Settings::get_setting( $form_id, 'background_color' );
+		if ( ! empty( $bg_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { background-color: {$bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-form-control { background-color: {$bg_color} !important; }\n";
+		}
+
+		// Add text color
+		$text_color = AJL_Settings::get_setting( $form_id, 'text_color' );
+		if ( ! empty( $text_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] { color: {$text_color} !important; }\n";
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { color: {$text_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} { color: {$text_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-form-control { color: {$text_color} !important; }\n";
+		}
+
+		// Add primary color (used for focus states, etc.)
+		$primary_color = AJL_Settings::get_setting( $form_id, 'primary_color' );
+		if ( ! empty( $primary_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control:focus { border-color: {$primary_color} !important; }\n";
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] a { color: {$primary_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-form-control:focus { border-color: {$primary_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} a { color: {$primary_color} !important; }\n";
+		}
+
+		// Add border radius - ALWAYS set button border radius to ensure we override WP Simple Pay defaults
+		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', 0 );
+		
+		// For form controls
+		if ( '' !== $border_radius ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { border-radius: {$border_radius}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-form-control { border-radius: {$border_radius}px !important; }\n";
+		}
+		
+		// Always explicitly set button border radius to override WP Simple Pay's default 4px
+		$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+		$css .= "#simpay-form-{$form_id} .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+		$css .= "#simpay-form-{$form_id} .simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
+		$css .= "#simpay-form-{$form_id} .simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
+
+		// Target the buttons with higher specificity to override WP Simple Pay defaults
+		$css .= "body .simpay-form-wrap[data-form-id=\"{$form_id}\"] button.simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+		$css .= "body #simpay-form-{$form_id} button.simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
+		$css .= "body #simpay-form-{$form_id} button.simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
+
+		// Add button background color
+		$button_bg_color = AJL_Settings::get_setting( $form_id, 'button_background_color', '#0f8569' );
+		if ( ! empty( $button_bg_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn { background-color: {$button_bg_color} !important; border-color: {$button_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-payment-btn { background-color: {$button_bg_color} !important; border-color: {$button_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-checkout-btn { background-color: {$button_bg_color} !important; border-color: {$button_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-apply-coupon { background-color: {$button_bg_color} !important; border-color: {$button_bg_color} !important; }\n";
+		}
+
+		// Add button text color
+		$button_text_color = AJL_Settings::get_setting( $form_id, 'button_text_color', '#ffffff' );
+		if ( ! empty( $button_text_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn { color: {$button_text_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-payment-btn { color: {$button_text_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-checkout-btn { color: {$button_text_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-apply-coupon { color: {$button_text_color} !important; }\n";
+		}
+
+		// Add button hover background color
+		$button_hover_bg_color = AJL_Settings::get_setting( $form_id, 'button_hover_background_color', '#0e7c62' );
+		if ( ! empty( $button_hover_bg_color ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn:hover { background-color: {$button_hover_bg_color} !important; border-color: {$button_hover_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-payment-btn:hover { background-color: {$button_hover_bg_color} !important; border-color: {$button_hover_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-checkout-btn:hover { background-color: {$button_hover_bg_color} !important; border-color: {$button_hover_bg_color} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-apply-coupon:hover { background-color: {$button_hover_bg_color} !important; border-color: {$button_hover_bg_color} !important; }\n";
+		}
+
+		// Add font sizes
+		$label_font_size = AJL_Settings::get_setting( $form_id, 'label_font_size' );
+		if ( ! empty( $label_font_size ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] label.simpay-form-control { font-size: {$label_font_size}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} label.simpay-form-control { font-size: {$label_font_size}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-label { font-size: {$label_font_size}px !important; }\n";
+		}
+
+		$input_font_size = AJL_Settings::get_setting( $form_id, 'input_font_size' );
+		if ( ! empty( $input_font_size ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { font-size: {$input_font_size}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-form-control { font-size: {$input_font_size}px !important; }\n";
+		}
+
+		// Add font weights
+		$label_font_weight = AJL_Settings::get_setting( $form_id, 'label_font_weight' );
+		if ( ! empty( $label_font_weight ) ) {
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] label.simpay-form-control { font-weight: {$label_font_weight} !important; }\n";
+			$css .= "#simpay-form-{$form_id} label.simpay-form-control { font-weight: {$label_font_weight} !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-label { font-weight: {$label_font_weight} !important; }\n";
+		}
+
+		return $css;
+	}
 } 

@@ -116,6 +116,9 @@ class AJL_Admin_UI {
 				'ajlWpspsData',
 				[
 					'resetConfirmMessage' => __( 'Are you sure you want to reset all style settings to default values?', 'ajl-wp-simple-pay-styles' ),
+					'selectText' => __( 'Select', 'ajl-wp-simple-pay-styles' ),
+					'selectedText' => __( 'Selected', 'ajl-wp-simple-pay-styles' ),
+					'themeAppliedMessage' => __( 'Theme "%s" has been applied! Save the form to keep these changes.', 'ajl-wp-simple-pay-styles' ),
 				]
 			);
 		}
@@ -149,7 +152,11 @@ class AJL_Admin_UI {
 		<div class="ajl-wpsps-tabs-container">
 			<!-- Tabs Navigation -->
 			<div class="ajl-wpsps-tabs-nav">
-				<button type="button" class="ajl-wpsps-tab-button active" data-tab="colors">
+				<button type="button" class="ajl-wpsps-tab-button active" data-tab="themes">
+					<span class="dashicons dashicons-admin-appearance"></span>
+					<?php esc_html_e( 'Themes', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+				<button type="button" class="ajl-wpsps-tab-button" data-tab="colors">
 					<span class="dashicons dashicons-art"></span>
 					<?php esc_html_e( 'Colors', 'ajl-wp-simple-pay-styles' ); ?>
 				</button>
@@ -169,8 +176,163 @@ class AJL_Admin_UI {
 
 			<!-- Tabs Content -->
 			<div class="ajl-wpsps-tabs-content">
+				<!-- Themes Tab -->
+				<div class="ajl-wpsps-tab-panel active" data-tab-content="themes">
+					<div class="ajl-wpsps-theme-grid">
+						<?php
+						// Get the current selected theme
+						$current_theme = AJL_Settings::get_setting( $post_id, 'selected_theme', 'default' );
+						
+						// Define theme presets
+						$themes = [
+							'default' => [
+								'name' => __( 'Default', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#0f8569',
+									'secondary' => '#0e7c62',
+									'text' => '#32325d',
+									'background' => '#ffffff',
+								],
+								'description' => __( 'WP Simple Pay\'s default styling', 'ajl-wp-simple-pay-styles' ),
+							],
+							'midnight' => [
+								'name' => __( 'Midnight', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#2c3e50',
+									'secondary' => '#1a252f',
+									'text' => '#ffffff',
+									'background' => '#34495e',
+								],
+								'description' => __( 'Dark theme with cool blue tones', 'ajl-wp-simple-pay-styles' ),
+							],
+							'sunset' => [
+								'name' => __( 'Sunset', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#e74c3c',
+									'secondary' => '#c0392b',
+									'text' => '#2c3e50',
+									'background' => '#ecf0f1',
+								],
+								'description' => __( 'Warm red accents with light background', 'ajl-wp-simple-pay-styles' ),
+							],
+							'forest' => [
+								'name' => __( 'Forest', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#27ae60',
+									'secondary' => '#219955',
+									'text' => '#2c3e50',
+									'background' => '#f9f9f9',
+								],
+								'description' => __( 'Fresh green theme with clean background', 'ajl-wp-simple-pay-styles' ),
+							],
+							'ocean' => [
+								'name' => __( 'Ocean', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#3498db',
+									'secondary' => '#2980b9',
+									'text' => '#2c3e50',
+									'background' => '#ecf0f1',
+								],
+								'description' => __( 'Calming blue palette', 'ajl-wp-simple-pay-styles' ),
+							],
+							'lavender' => [
+								'name' => __( 'Lavender', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#9b59b6',
+									'secondary' => '#8e44ad',
+									'text' => '#2c3e50',
+									'background' => '#f5f5f5',
+								],
+								'description' => __( 'Elegant purple theme', 'ajl-wp-simple-pay-styles' ),
+							],
+							'monochrome' => [
+								'name' => __( 'Monochrome', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#333333',
+									'secondary' => '#555555',
+									'text' => '#333333',
+									'background' => '#ffffff',
+								],
+								'description' => __( 'Simple black and white theme', 'ajl-wp-simple-pay-styles' ),
+							],
+							'sunshine' => [
+								'name' => __( 'Sunshine', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#f1c40f',
+									'secondary' => '#f39c12',
+									'text' => '#34495e',
+									'background' => '#ffffff',
+								],
+								'description' => __( 'Bright and cheerful yellow accents', 'ajl-wp-simple-pay-styles' ),
+							],
+							'coral' => [
+								'name' => __( 'Coral', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#e67e22',
+									'secondary' => '#d35400',
+									'text' => '#2c3e50',
+									'background' => '#f9f9f9',
+								],
+								'description' => __( 'Warm orange palette', 'ajl-wp-simple-pay-styles' ),
+							],
+							'minimal' => [
+								'name' => __( 'Minimal', 'ajl-wp-simple-pay-styles' ),
+								'colors' => [
+									'primary' => '#bdc3c7',
+									'secondary' => '#95a5a6',
+									'text' => '#2c3e50',
+									'background' => '#ffffff',
+								],
+								'description' => __( 'Clean, minimalist design', 'ajl-wp-simple-pay-styles' ),
+							],
+						];
+						
+						// Store themes in a hidden field for JavaScript access
+						echo '<input type="hidden" id="ajl_wpsps_theme_presets" value="' . esc_attr( json_encode( $themes ) ) . '">';
+						
+						// Output theme selection cards
+						foreach ( $themes as $theme_id => $theme ) {
+							$is_selected = $current_theme === $theme_id;
+							?>
+							<div class="ajl-wpsps-theme-card <?php echo $is_selected ? 'selected' : ''; ?>" data-theme-id="<?php echo esc_attr( $theme_id ); ?>">
+								<div class="ajl-wpsps-theme-preview">
+									<div class="ajl-wpsps-theme-colors">
+										<span class="ajl-wpsps-theme-color primary" style="background-color: <?php echo esc_attr( $theme['colors']['primary'] ); ?>"></span>
+										<span class="ajl-wpsps-theme-color secondary" style="background-color: <?php echo esc_attr( $theme['colors']['secondary'] ); ?>"></span>
+										<span class="ajl-wpsps-theme-color text" style="background-color: <?php echo esc_attr( $theme['colors']['text'] ); ?>"></span>
+										<span class="ajl-wpsps-theme-color background" style="background-color: <?php echo esc_attr( $theme['colors']['background'] ); ?>"></span>
+									</div>
+									<div class="ajl-wpsps-theme-button" style="background-color: <?php echo esc_attr( $theme['colors']['primary'] ); ?>; color: #ffffff;">
+										<?php esc_html_e( 'Button', 'ajl-wp-simple-pay-styles' ); ?>
+									</div>
+								</div>
+								<div class="ajl-wpsps-theme-info">
+									<h4><?php echo esc_html( $theme['name'] ); ?></h4>
+									<p><?php echo esc_html( $theme['description'] ); ?></p>
+									<input 
+										type="radio" 
+										name="ajl_wpsps[selected_theme]" 
+										value="<?php echo esc_attr( $theme_id ); ?>" 
+										id="ajl_wpsps_theme_<?php echo esc_attr( $theme_id ); ?>"
+										<?php checked( $current_theme, $theme_id ); ?>
+										class="ajl-wpsps-theme-radio"
+									>
+									<label for="ajl_wpsps_theme_<?php echo esc_attr( $theme_id ); ?>" class="ajl-wpsps-theme-select button button-primary">
+										<?php echo $is_selected ? esc_html__( 'Selected', 'ajl-wp-simple-pay-styles' ) : esc_html__( 'Select', 'ajl-wp-simple-pay-styles' ); ?>
+									</label>
+								</div>
+							</div>
+							<?php
+						}
+						?>
+					</div>
+					<div class="ajl-wpsps-theme-instructions">
+						<p><?php esc_html_e( 'Select a theme to instantly apply a complete set of coordinated styles. You can customize individual settings in the other tabs after applying a theme.', 'ajl-wp-simple-pay-styles' ); ?></p>
+					</div>
+				</div>
+
 				<!-- Colors Tab -->
-				<div class="ajl-wpsps-tab-panel active" data-tab-content="colors">
+				<div class="ajl-wpsps-tab-panel" data-tab-content="colors">
 					<div class="ajl-wpsps-form-grid">
 						<!-- Form Container Background Color -->
 						<div class="ajl-wpsps-form-field">

@@ -49,6 +49,12 @@ class AJL_Settings {
 				$value = sanitize_hex_color( $value );
 				break;
 			case 'border_radius':
+				$value = absint( $value ); // Assuming pixels for now
+				// For the border radius, treat empty and 0 consistently
+				if ($value === 0 && $default === '') {
+					$default = 0;
+				}
+				break;
 			case 'label_font_size':
 			case 'input_font_size':
 				$value = absint( $value ); // Assuming pixels for now
@@ -106,23 +112,24 @@ class AJL_Settings {
 	}
 
 	/**
-	 * Get all available style keys.
+	 * Get all style setting keys.
 	 *
-	 * @return array
+	 * @return array Array of style setting keys.
 	 */
 	public static function get_style_keys() {
 		return [
-			'primary_color',
-			'background_color', // Input background
+			'selected_theme',
+			'form_container_background_color',
+			'background_color',
 			'text_color',
-			'border_radius',
+			'primary_color',
 			'button_background_color',
 			'button_text_color',
 			'button_hover_background_color',
+			'border_radius',
 			'label_font_size',
 			'label_font_weight',
 			'input_font_size',
-			'form_container_background_color', // New setting
 		];
 	}
 
