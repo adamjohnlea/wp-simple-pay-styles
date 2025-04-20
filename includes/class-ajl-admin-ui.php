@@ -352,7 +352,7 @@ class AJL_Admin_UI {
 									type="number" 
 									id="ajl_wpsps_border_radius" 
 									name="ajl_wpsps[border_radius]" 
-									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', '4' ) ); ?>" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>" 
 									step="1"
 								/>
 								<span class="ajl-wpsps-unit">px</span>

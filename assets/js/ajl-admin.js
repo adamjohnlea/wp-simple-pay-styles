@@ -96,8 +96,14 @@
      * Initialize the border radius preview
      */
     function initBorderRadiusPreview() {
+        var $input = $('#ajl_wpsps_border_radius');
+        
+        // Initialize preview on page load with whatever value is in the input
+        var initialRadius = $input.val() || '0';
+        $('.ajl-wpsps-radius-box').css('border-radius', initialRadius + 'px');
+        
         // Update border radius preview when the input changes
-        $('#ajl_wpsps_border_radius').on('input change', function() {
+        $input.on('input change', function() {
             var radius = $(this).val() + 'px';
             $('.ajl-wpsps-radius-box').css('border-radius', radius);
         });
@@ -142,7 +148,7 @@
                     } else if ($input.attr('id') === 'ajl_wpsps_input_font_size') {
                         $input.val('16');
                     } else if ($input.attr('id') === 'ajl_wpsps_border_radius') {
-                        $input.val('4');
+                        $input.val('3');
                     }
                 }
             });
