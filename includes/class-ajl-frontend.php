@@ -170,6 +170,17 @@ class AJL_Frontend {
 		    $config['appearance']['rules']['.p-FauxInput']['color'] = $input_text_color;
 		}
 
+		// Apply border color
+		$border_color = AJL_Settings::get_setting( $form_id, 'border_color' );
+		if ( $border_color ) {
+		    // Add border color to inputs
+		    $config['appearance']['rules']['.Input']['boxShadow'] = '0 0 0 1px ' . $border_color . ', 0 1px 2px rgba(0, 0, 0, 0.05)';
+		    $config['appearance']['rules']['.CodeInput']['boxShadow'] = $config['appearance']['rules']['.Input']['boxShadow'];
+		    $config['appearance']['rules']['.CheckboxInput']['boxShadow'] = $config['appearance']['rules']['.Input']['boxShadow'];
+		    $config['appearance']['rules']['.p-Select-select']['boxShadow'] = $config['appearance']['rules']['.Input']['boxShadow'];
+		    $config['appearance']['rules']['.p-Select-select']['borderColor'] = $border_color;
+		}
+
 		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', 0 );
 		if ( $border_radius !== '' ) { // Allow 0
 			$config['appearance']['variables']['borderRadius'] = $border_radius . 'px';
@@ -381,6 +392,21 @@ class AJL_Frontend {
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement input { color: {$input_text_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement option { color: {$input_text_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .p-FauxInput { color: {$input_text_color} !important; }\n";
+		}
+
+		// Add border color
+		$border_color = AJL_Settings::get_setting( $form_id, 'border_color' );
+		if ( ! empty( $border_color ) ) {
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { border-color: {$border_color} !important; }\n";
+		    $css .= "#simpay-form-{$form_id} .simpay-form-control { border-color: {$border_color} !important; }\n";
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] input:not([type='submit']) { border-color: {$border_color} !important; }\n";
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] select { border-color: {$border_color} !important; }\n";
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] textarea { border-color: {$border_color} !important; }\n";
+		    
+		    // Add specific style for Stripe elements
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement { border-color: {$border_color} !important; }\n";
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input { box-shadow: 0 0 0 1px {$border_color}, 0 1px 2px rgba(0, 0, 0, 0.05) !important; }\n";
+		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .CodeInput { box-shadow: 0 0 0 1px {$border_color}, 0 1px 2px rgba(0, 0, 0, 0.05) !important; }\n";
 		}
 
 		// Add primary color (used for focus states, etc.)

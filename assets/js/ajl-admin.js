@@ -126,6 +126,11 @@
                 updateColorPicker('#ajl_wpsps_input_text_color', themeSettings.input_text_color);
             }
             
+            // Border color
+            if (themeSettings.border_color) {
+                updateColorPicker('#ajl_wpsps_border_color', themeSettings.border_color);
+            }
+            
             // Primary color
             updateColorPicker('#ajl_wpsps_primary_color', themeSettings.primary_color);
             
@@ -171,6 +176,7 @@
             text_color: '#32325d',
             label_text_color: '', // Will inherit from text_color if empty
             input_text_color: '', // Will inherit from text_color if empty
+            border_color: '#e6e6e6',
             primary_color: '#0f8569',
             button_background_color: '#0f8569',
             button_text_color: '#ffffff',
@@ -193,13 +199,109 @@
             button_hover_background_color: theme.colors.secondary
         };
         
-        // Set specific colors for specific themes
-        if (themeId === 'midnight' || themeId === 'monochrome') {
-            // For dark themes, ensure input text is visible on dark backgrounds
-            if (theme.colors.background.toLowerCase() === '#34495e' || 
-                theme.colors.background.toLowerCase() === '#2c3e50') {
-                themeSettings.input_text_color = '#ffffff'; // White text for dark backgrounds
-            }
+        // Create more visually distinct themes by setting specific colors for different elements
+        switch (themeId) {
+            case 'midnight':
+                // Dark theme with blue tones
+                themeSettings.form_container_background_color = '#2c3e50'; // Darker background
+                themeSettings.background_color = '#34495e'; // Lighter inputs
+                themeSettings.text_color = '#ecf0f1'; // Light text
+                themeSettings.label_text_color = '#bdc3c7'; // Slightly muted label text
+                themeSettings.input_text_color = '#ffffff'; // White input text
+                themeSettings.border_color = '#1a252f'; // Dark borders
+                themeSettings.primary_color = '#3498db'; // Bright blue for focus states
+                break;
+                
+            case 'monochrome':
+                // Black and white theme with gray accents
+                themeSettings.form_container_background_color = '#f5f5f5'; // Light gray container
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#333333'; // Dark text
+                themeSettings.label_text_color = '#555555'; // Medium gray labels
+                themeSettings.input_text_color = '#000000'; // Black input text
+                themeSettings.border_color = '#cccccc'; // Medium gray borders
+                themeSettings.primary_color = '#333333'; // Black primary color
+                break;
+                
+            case 'sunset':
+                // Warm red theme
+                themeSettings.form_container_background_color = '#fff5f2'; // Very light peach
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#c0392b'; // Dark red labels
+                themeSettings.border_color = '#f2d6d0'; // Light pink borders
+                themeSettings.primary_color = '#e74c3c'; // Bright red primary
+                break;
+                
+            case 'forest':
+                // Green theme
+                themeSettings.form_container_background_color = '#f2f9f5'; // Very light green
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#1e8449'; // Darker green labels
+                themeSettings.border_color = '#d5e9db'; // Light green borders
+                themeSettings.primary_color = '#27ae60'; // Medium green primary
+                break;
+                
+            case 'ocean':
+                // Blue theme
+                themeSettings.form_container_background_color = '#f0f8fd'; // Very light blue
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#2980b9'; // Medium blue labels
+                themeSettings.border_color = '#d6eaf8'; // Light blue borders
+                themeSettings.primary_color = '#3498db'; // Bright blue primary
+                break;
+                
+            case 'lavender':
+                // Purple theme
+                themeSettings.form_container_background_color = '#f7f2fa'; // Very light purple
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#8e44ad'; // Medium purple labels
+                themeSettings.border_color = '#e8daef'; // Light purple borders
+                themeSettings.primary_color = '#9b59b6'; // Bright purple primary
+                break;
+                
+            case 'sunshine':
+                // Yellow theme
+                themeSettings.form_container_background_color = '#fffcef'; // Very light yellow
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#34495e'; // Dark blue-gray text
+                themeSettings.label_text_color = '#d4ac0d'; // Darker yellow labels
+                themeSettings.border_color = '#fcf3cf'; // Light yellow borders
+                themeSettings.primary_color = '#f1c40f'; // Bright yellow primary
+                break;
+                
+            case 'coral':
+                // Orange theme
+                themeSettings.form_container_background_color = '#fdf2e9'; // Very light orange
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#d35400'; // Darker orange labels
+                themeSettings.border_color = '#fae5d3'; // Light orange borders
+                themeSettings.primary_color = '#e67e22'; // Medium orange primary
+                break;
+                
+            case 'minimal':
+                // Minimal white and gray theme
+                themeSettings.form_container_background_color = '#ffffff'; // White container
+                themeSettings.background_color = '#f9f9f9'; // Very light gray inputs
+                themeSettings.text_color = '#2c3e50'; // Dark text
+                themeSettings.label_text_color = '#7f8c8d'; // Medium gray labels
+                themeSettings.input_text_color = '#2c3e50'; // Dark input text
+                themeSettings.border_color = '#ecf0f1'; // Light borders
+                themeSettings.primary_color = '#bdc3c7'; // Medium gray primary
+                break;
+                
+            case 'default':
+                // WP Simple Pay's default styling
+                themeSettings.form_container_background_color = '#ffffff'; // White container
+                themeSettings.background_color = '#ffffff'; // White inputs
+                themeSettings.text_color = '#32325d'; // Default text color
+                themeSettings.primary_color = '#0f8569'; // Default primary color
+                themeSettings.border_color = '#e6e6e6'; // Default borders
+                break;
         }
         
         // Add theme-specific layout values
