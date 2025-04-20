@@ -383,7 +383,7 @@ class AJL_Admin_UI {
 									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color' ) ); ?>" 
 									class="ajl-color-picker"
 								/>
-								<div class="ajl-wpsps-button-preview" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color', '#2271b1' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+								<div class="ajl-wpsps-button-preview" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color', '#0f8569' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
 									<?php esc_html_e( 'Button Preview', 'ajl-wp-simple-pay-styles' ); ?>
 								</div>
 							</div>
@@ -418,7 +418,7 @@ class AJL_Admin_UI {
 									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color' ) ); ?>" 
 									class="ajl-color-picker"
 								/>
-								<div class="ajl-wpsps-button-preview ajl-wpsps-button-hover" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color', '#135e96' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+								<div class="ajl-wpsps-button-preview ajl-wpsps-button-hover" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color', '#0e7c62' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
 									<?php esc_html_e( 'Hover Preview', 'ajl-wp-simple-pay-styles' ); ?>
 								</div>
 							</div>
