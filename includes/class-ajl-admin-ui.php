@@ -81,12 +81,43 @@ class AJL_Admin_UI {
 			// Enqueue WordPress color picker scripts and styles.
 			wp_enqueue_style( 'wp-color-picker' );
 			wp_enqueue_script( 'wp-color-picker' );
+			
+			// Enqueue color picker alpha addon if available
+			if ( ! wp_script_is( 'wp-color-picker-alpha', 'registered' ) ) {
+				wp_register_script(
+					'wp-color-picker-alpha',
+					AJL_WPSPS_URL . 'assets/js/wp-color-picker-alpha.min.js',
+					array( 'wp-color-picker' ),
+					'3.0.0',
+					true
+				);
+			}
+			wp_enqueue_script( 'wp-color-picker-alpha' );
+			
+			// Enqueue custom admin styles and scripts
+			wp_enqueue_style( 
+				'ajl-wpsps-admin-css', 
+				AJL_WPSPS_URL . 'assets/css/ajl-admin.css', 
+				[], 
+				AJL_WPSPS_VERSION 
+			);
+			
+			wp_enqueue_script( 
+				'ajl-wpsps-admin-js', 
+				AJL_WPSPS_URL . 'assets/js/ajl-admin.js', 
+				['jquery', 'wp-color-picker', 'wp-color-picker-alpha'], 
+				AJL_WPSPS_VERSION, 
+				true 
+			);
 
-			// Inline script is simpler for just the color picker init
-			wp_add_inline_script( 'wp-color-picker', 'jQuery(document).ready(function($){$(".ajl-color-picker").wpColorPicker();});' );
-
-			// Future: Enqueue custom CSS for the settings layout if needed
-			// wp_enqueue_style( 'ajl-wpsps-admin-css', AJL_WPSPS_URL . 'assets/css/ajl-admin.css', [], AJL_WPSPS_VERSION );
+			// Pass localized data to the JS
+			wp_localize_script(
+				'ajl-wpsps-admin-js',
+				'ajlWpspsData',
+				[
+					'resetConfirmMessage' => __( 'Are you sure you want to reset all style settings to default values?', 'ajl-wp-simple-pay-styles' ),
+				]
+			);
 		}
 	}
 
@@ -112,78 +143,302 @@ class AJL_Admin_UI {
 		wp_nonce_field( 'ajl_wpsps_save_styles', 'ajl_wpsps_styles_nonce' );
 
 		$style_keys = AJL_Settings::get_style_keys();
+		
+		// Start the modern tabbed interface
+		?>
+		<div class="ajl-wpsps-tabs-container">
+			<!-- Tabs Navigation -->
+			<div class="ajl-wpsps-tabs-nav">
+				<button type="button" class="ajl-wpsps-tab-button active" data-tab="colors">
+					<span class="dashicons dashicons-art"></span>
+					<?php esc_html_e( 'Colors', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+				<button type="button" class="ajl-wpsps-tab-button" data-tab="typography">
+					<span class="dashicons dashicons-editor-textcolor"></span>
+					<?php esc_html_e( 'Typography', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+				<button type="button" class="ajl-wpsps-tab-button" data-tab="layout">
+					<span class="dashicons dashicons-layout"></span>
+					<?php esc_html_e( 'Layout', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+				<button type="button" class="ajl-wpsps-tab-button" data-tab="buttons">
+					<span class="dashicons dashicons-button"></span>
+					<?php esc_html_e( 'Buttons', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+			</div>
 
-		echo '<table class="form-table">'; // Using form-table for standard WordPress styling
+			<!-- Tabs Content -->
+			<div class="ajl-wpsps-tabs-content">
+				<!-- Colors Tab -->
+				<div class="ajl-wpsps-tab-panel active" data-tab-content="colors">
+					<div class="ajl-wpsps-form-grid">
+						<!-- Form Container Background Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_form_container_background_color">
+								<?php esc_html_e( 'Form Background', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_form_container_background_color" 
+									name="ajl_wpsps[form_container_background_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'form_container_background_color' ) ); ?>" 
+									class="ajl-color-picker" 
+									data-alpha-enabled="true"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Form', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Background color of the entire form container', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
 
-		foreach ( $style_keys as $key ) {
-			$value = AJL_Settings::get_setting( $post_id, $key );
-			$label = ucwords( str_replace( '_', ' ', $key ) ); // Simple label generation
-			$label = ( $key === 'background_color' ) ? 'Input Background Color' : $label; // Clarify Input BG
-			$label = ( $key === 'form_container_background_color' ) ? 'Form Background Color' : $label; // Better Label
+						<!-- Input Background Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_background_color">
+								<?php esc_html_e( 'Input Background', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_background_color" 
+									name="ajl_wpsps[background_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'background_color' ) ); ?>" 
+									class="ajl-color-picker" 
+									data-alpha-enabled="true"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Input', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Background color of input fields', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
 
-			echo '<tr>';
-			echo '<th scope="row"><label for="ajl_wpsps_' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label></th>';
-			echo '<td>';
+						<!-- Text Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_text_color">
+								<?php esc_html_e( 'Text Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_text_color" 
+									name="ajl_wpsps[text_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'text_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Text', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Color for labels and input text', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
 
-			// Render different field types based on the key
-			switch ( $key ) {
-				case 'primary_color':
-				case 'background_color': // Input background
-				case 'form_container_background_color': // Form background
-				case 'text_color':
-				case 'button_background_color':
-				case 'button_text_color':
-				case 'button_hover_background_color':
-					printf(
-						'<input type="text" id="ajl_wpsps_%1$s" name="ajl_wpsps[%1$s]" value="%2$s" class="ajl-color-picker" data-default-color="%2$s" />',
-						esc_attr( $key ),
-						esc_attr( $value )
-					);
-					break;
+						<!-- Primary Color (Accent) -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_primary_color">
+								<?php esc_html_e( 'Primary (Accent) Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_primary_color" 
+									name="ajl_wpsps[primary_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'primary_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-color-preview-label"><?php esc_html_e( 'Accent', 'ajl-wp-simple-pay-styles' ); ?></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Used for focus states and highlights', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+					</div>
+				</div>
 
-				case 'border_radius':
-				case 'label_font_size':
-				case 'input_font_size':
-					printf(
-						'<input type="number" id="ajl_wpsps_%1$s" name="ajl_wpsps[%1$s]" value="%2$s" class="small-text" min="0" step="1" /> px',
-						esc_attr( $key ),
-						esc_attr( $value )
-					);
-					break;
+				<!-- Typography Tab -->
+				<div class="ajl-wpsps-tab-panel" data-tab-content="typography">
+					<div class="ajl-wpsps-form-grid">
+						<!-- Label Font Size -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_label_font_size">
+								<?php esc_html_e( 'Label Font Size', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-input-with-unit">
+								<input 
+									type="number" 
+									id="ajl_wpsps_label_font_size" 
+									name="ajl_wpsps[label_font_size]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'label_font_size', '14' ) ); ?>" 
+									step="1"
+								/>
+								<span class="ajl-wpsps-unit">px</span>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Size of form field labels', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
 
-				case 'label_font_weight':
-					$options = [
-						''       => __( 'Theme Default', 'ajl-wp-simple-pay-styles' ),
-						'normal' => __( 'Normal', 'ajl-wp-simple-pay-styles' ),
-						'bold'   => __( 'Bold', 'ajl-wp-simple-pay-styles' ),
-						'100' => '100', '200' => '200', '300' => '300', '400' => '400', '500' => '500', '600' => '600', '700' => '700', '800' => '800', '900' => '900'
-					];
-					printf( '<select id="ajl_wpsps_%1$s" name="ajl_wpsps[%1$s]">', esc_attr( $key ) );
-					foreach ( $options as $val => $label_text ) {
-						printf(
-							'<option value="%s" %s>%s</option>',
-							esc_attr( $val ),
-							selected( $value, $val, false ),
-							esc_html( $label_text )
-						);
-					}
-					printf( '</select>' );
-					break;
+						<!-- Label Font Weight -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_label_font_weight">
+								<?php esc_html_e( 'Label Font Weight', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<select id="ajl_wpsps_label_font_weight" name="ajl_wpsps[label_font_weight]" class="ajl-wpsps-select">
+								<?php
+								$current_weight = AJL_Settings::get_setting( $post_id, 'label_font_weight' );
+								$weight_options = [
+									'' => __( 'Theme Default', 'ajl-wp-simple-pay-styles' ),
+									'normal' => __( 'Normal', 'ajl-wp-simple-pay-styles' ),
+									'bold' => __( 'Bold', 'ajl-wp-simple-pay-styles' ),
+									'100' => '100 (Thin)',
+									'200' => '200 (Extra Light)',
+									'300' => '300 (Light)',
+									'400' => '400 (Normal)',
+									'500' => '500 (Medium)',
+									'600' => '600 (Semi Bold)',
+									'700' => '700 (Bold)',
+									'800' => '800 (Extra Bold)',
+									'900' => '900 (Black)',
+								];
+								
+								foreach ( $weight_options as $value => $label ) {
+									printf(
+										'<option value="%s" %s>%s</option>',
+										esc_attr( $value ),
+										selected( $current_weight, $value, false ),
+										esc_html( $label )
+									);
+								}
+								?>
+							</select>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Font weight for form labels', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
 
-				default:
-					// Basic text input as fallback
-					printf(
-						'<input type="text" id="ajl_wpsps_%1$s" name="ajl_wpsps[%1$s]" value="%2$s" class="regular-text" />',
-						esc_attr( $key ),
-						esc_attr( $value )
-					);
-			}
+						<!-- Input Font Size -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_input_font_size">
+								<?php esc_html_e( 'Input Font Size', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-input-with-unit">
+								<input 
+									type="number" 
+									id="ajl_wpsps_input_font_size" 
+									name="ajl_wpsps[input_font_size]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'input_font_size', '16' ) ); ?>" 
+									step="1"
+								/>
+								<span class="ajl-wpsps-unit">px</span>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Size of text in form inputs', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+					</div>
+				</div>
 
-			echo '</td>';
-			echo '</tr>';
-		}
+				<!-- Layout Tab -->
+				<div class="ajl-wpsps-tab-panel" data-tab-content="layout">
+					<div class="ajl-wpsps-form-grid">
+						<!-- Border Radius -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_border_radius">
+								<?php esc_html_e( 'Border Radius', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-input-with-unit">
+								<input 
+									type="number" 
+									id="ajl_wpsps_border_radius" 
+									name="ajl_wpsps[border_radius]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', '4' ) ); ?>" 
+									step="1"
+								/>
+								<span class="ajl-wpsps-unit">px</span>
+							</div>
+							<div class="ajl-wpsps-radius-preview">
+								<div class="ajl-wpsps-radius-box" style="border-radius: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'border_radius', 0 ) ); ?>px;"></div>
+							</div>
+							<p class="ajl-wpsps-field-description">
+								<?php esc_html_e( 'Rounded corners for inputs and buttons', 'ajl-wp-simple-pay-styles' ); ?>
+							</p>
+						</div>
+					</div>
+				</div>
 
-		echo '</table>';
+				<!-- Buttons Tab -->
+				<div class="ajl-wpsps-tab-panel" data-tab-content="buttons">
+					<div class="ajl-wpsps-form-grid">
+						<!-- Button Background Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_button_background_color">
+								<?php esc_html_e( 'Button Background', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_button_background_color" 
+									name="ajl_wpsps[button_background_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-button-preview" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_background_color', '#2271b1' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+									<?php esc_html_e( 'Button Preview', 'ajl-wp-simple-pay-styles' ); ?>
+								</div>
+							</div>
+						</div>
+
+						<!-- Button Text Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_button_text_color">
+								<?php esc_html_e( 'Button Text Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_button_text_color" 
+									name="ajl_wpsps[button_text_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+							</div>
+						</div>
+
+						<!-- Button Hover Background Color -->
+						<div class="ajl-wpsps-form-field">
+							<label for="ajl_wpsps_button_hover_background_color">
+								<?php esc_html_e( 'Button Hover Color', 'ajl-wp-simple-pay-styles' ); ?>
+							</label>
+							<div class="ajl-wpsps-color-preview-wrap">
+								<input 
+									type="text" 
+									id="ajl_wpsps_button_hover_background_color" 
+									name="ajl_wpsps[button_hover_background_color]" 
+									value="<?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color' ) ); ?>" 
+									class="ajl-color-picker"
+								/>
+								<div class="ajl-wpsps-button-preview ajl-wpsps-button-hover" style="background-color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_hover_background_color', '#135e96' ) ); ?>; color: <?php echo esc_attr( AJL_Settings::get_setting( $post_id, 'button_text_color', '#ffffff' ) ); ?>">
+									<?php esc_html_e( 'Hover Preview', 'ajl-wp-simple-pay-styles' ); ?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Reset Button and Action Area -->
+			<div class="ajl-wpsps-actions">
+				<button type="button" id="ajl-wpsps-reset-styles" class="button button-secondary">
+					<span class="dashicons dashicons-image-rotate"></span>
+					<?php esc_html_e( 'Reset Styles', 'ajl-wp-simple-pay-styles' ); ?>
+				</button>
+				<p class="ajl-wpsps-reset-description">
+					<?php esc_html_e( 'Resets all style settings to default. This action cannot be undone.', 'ajl-wp-simple-pay-styles' ); ?>
+				</p>
+			</div>
+		</div>
+		<?php
 	}
 
 
@@ -223,6 +478,18 @@ class AJL_Admin_UI {
 		$display_type = get_post_meta( $post_id, '_form_display_type', true );
 		$is_on_site = in_array( $display_type, [ 'embedded', 'overlay' ], true );
 
+		// Check if reset action was triggered
+		$is_reset = isset( $_POST['ajl_wpsps_reset'] ) && $_POST['ajl_wpsps_reset'] === 'true';
+		
+		if ( $is_reset ) {
+			// Delete all style settings if reset was requested
+			$style_keys = AJL_Settings::get_style_keys();
+			foreach ( $style_keys as $key ) {
+				AJL_Settings::delete_setting( $post_id, $key );
+			}
+			return;
+		}
+
 		$settings_data = isset( $_POST['ajl_wpsps'] ) && is_array( $_POST['ajl_wpsps'] ) ? $_POST['ajl_wpsps'] : [];
 		$style_keys    = AJL_Settings::get_style_keys();
 
@@ -242,6 +509,10 @@ class AJL_Admin_UI {
 						case 'button_text_color':
 						case 'button_hover_background_color':
 							$sanitized_value = sanitize_hex_color( $settings_data[ $key ] );
+							// Allow rgba values (for transparent backgrounds)
+							if ( empty( $sanitized_value ) && preg_match( '/rgba?\((\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,?\s*[\d\.]*\s*)\)/', $settings_data[ $key ] ) ) {
+								$sanitized_value = $settings_data[ $key ];
+							}
 							break;
 						case 'border_radius':
 						case 'label_font_size':

@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define constants.
  */
+define( 'AJL_WPSPS_BASENAME', plugin_basename( __FILE__ ) );
 define( 'AJL_WPSPS_VERSION', '1.0.0' );
 define( 'AJL_WPSPS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AJL_WPSPS_URL', plugin_dir_url( __FILE__ ) );

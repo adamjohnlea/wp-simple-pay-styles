@@ -1,0 +1,231 @@
+/**
+ * WP Simple Pay Styles Admin CSS
+ *
+ * Modern tabbed interface for the WP Simple Pay Styles settings panel.
+ */
+
+/* Main Container */
+.ajl-wpsps-tabs-container {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    /* No overflow:hidden to ensure color picker dropdown is visible */
+    border: 1px solid #e2e4e7;
+    position: relative;
+}
+
+/* Tabs Navigation */
+.ajl-wpsps-tabs-nav {
+    display: flex;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e2e4e7;
+    position: sticky;
+    top: 32px; /* WP Admin bar height */
+    z-index: 10;
+}
+
+.ajl-wpsps-tab-button {
+    padding: 12px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: #555;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-right: 1px solid #e2e4e7;
+}
+
+.ajl-wpsps-tab-button:hover {
+    background: #f1f1f1;
+    color: #000;
+}
+
+.ajl-wpsps-tab-button.active {
+    background: #fff;
+    color: #0073aa;
+    border-bottom: 2px solid #0073aa;
+    margin-bottom: -1px;
+}
+
+.ajl-wpsps-tab-button .dashicons {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+}
+
+/* Tab Content */
+.ajl-wpsps-tabs-content {
+    padding: 25px;
+}
+
+.ajl-wpsps-tab-panel {
+    display: none;
+}
+
+.ajl-wpsps-tab-panel.active {
+    display: block;
+}
+
+/* Form Grid */
+.ajl-wpsps-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+/* Form Fields */
+.ajl-wpsps-form-field {
+    margin-bottom: 20px;
+}
+
+.ajl-wpsps-form-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #23282d;
+}
+
+.ajl-wpsps-field-description {
+    margin-top: 6px;
+    color: #757575;
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* Color Picker Customizations */
+.ajl-wpsps-color-preview-wrap {
+    position: relative;
+}
+
+.ajl-wpsps-color-preview-label {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #f1f1f1;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    color: #23282d;
+    opacity: 0.8;
+    z-index: 1;
+}
+
+.wp-picker-container {
+    position: relative;
+    z-index: 2;
+}
+
+.wp-picker-container.wp-picker-active {
+    z-index: 10;
+}
+
+/* Input with unit */
+.ajl-wpsps-input-with-unit {
+    position: relative;
+    max-width: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.ajl-wpsps-input-with-unit input {
+    width: 70px;
+    padding-right: 25px;
+}
+
+.ajl-wpsps-unit {
+    margin-left: 5px;
+    color: #757575;
+}
+
+/* Border Radius Preview */
+.ajl-wpsps-radius-preview {
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    padding: 10px;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+}
+
+.ajl-wpsps-radius-box {
+    width: 80px;
+    height: 80px;
+    background: #0073aa;
+    transition: border-radius 0.2s ease;
+}
+
+/* Button Previews */
+.ajl-wpsps-button-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    margin-top: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: #2271b1;
+    color: #fff;
+    cursor: default;
+}
+
+.ajl-wpsps-button-hover:hover {
+    opacity: 0.9;
+}
+
+/* Reset Button and Actions */
+.ajl-wpsps-actions {
+    margin-top: 20px;
+    padding: 15px 25px;
+    background: #f9f9f9;
+    border-top: 1px solid #e2e4e7;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+
+#ajl-wpsps-reset-styles {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ajl-wpsps-reset-description {
+    margin: 0;
+    color: #757575;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* Select Field */
+.ajl-wpsps-select {
+    min-width: 200px;
+    padding: 5px;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 782px) {
+    .ajl-wpsps-form-grid {
+        display: block;
+    }
+    
+    .ajl-wpsps-tabs-nav {
+        flex-wrap: wrap;
+    }
+    
+    .ajl-wpsps-tab-button {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+} 
