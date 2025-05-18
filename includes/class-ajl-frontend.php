@@ -118,7 +118,7 @@ class AJL_Frontend {
             $config['appearance']['rules']['.CodeInput:focus']['boxShadow'] = $config['appearance']['rules']['.Input:focus']['boxShadow'];
             $config['appearance']['rules']['.CheckboxInput:focus']['boxShadow'] = $config['appearance']['rules']['.Input:focus']['boxShadow'];
             $config['appearance']['rules']['.PickerItem--selected']['boxShadow'] = $config['appearance']['rules']['.Input:focus']['boxShadow'];
-            
+
             // Add focus styling for dropdown selects
             $config['appearance']['rules']['.p-Select-select:focus']['boxShadow'] = $config['appearance']['rules']['.Input:focus']['boxShadow'];
             $config['appearance']['rules']['.p-Select-select:focus']['borderColor'] = $primary_color;
@@ -127,7 +127,7 @@ class AJL_Frontend {
 		$background_color = AJL_Settings::get_setting( $form_id, 'background_color' );
 		if ( $background_color ) {
 			$config['appearance']['variables']['colorBackground'] = $background_color;
-            
+
             // Add explicit background color for select dropdowns
             $config['appearance']['rules']['.p-Select-select']['backgroundColor'] = $background_color;
             $config['appearance']['rules']['.p-Select-option']['backgroundColor'] = $background_color;
@@ -143,20 +143,20 @@ class AJL_Frontend {
             $config['appearance']['rules']['.PickerItem']['color'] = $text_color;
             $config['appearance']['rules']['.DropdownItem']['color'] = $text_color;
             $config['appearance']['rules']['.TabIcon--selected']['fill'] = $text_color;
-            
+
             // Add text color for select dropdown and options
             $config['appearance']['rules']['.p-Select-select']['color'] = $text_color;
             $config['appearance']['rules']['.p-Select-option']['color'] = $text_color;
             $config['appearance']['rules']['option']['color'] = $text_color;
 		}
-		
+
 		// Apply label text color (overrides general text color for labels)
 		$label_text_color = AJL_Settings::get_setting( $form_id, 'label_text_color' );
 		if ( $label_text_color ) {
 		    $config['appearance']['rules']['.Label']['color'] = $label_text_color;
 		    $config['appearance']['rules']['.TabLabel']['color'] = $label_text_color;
 		}
-		
+
 		// Apply input text color (overrides general text color for inputs)
 		$input_text_color = AJL_Settings::get_setting( $form_id, 'input_text_color' );
 		if ( $input_text_color ) {
@@ -181,10 +181,11 @@ class AJL_Frontend {
 		    $config['appearance']['rules']['.p-Select-select']['borderColor'] = $border_color;
 		}
 
-		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', 0 );
-		if ( $border_radius !== '' ) { // Allow 0
+		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', '' );
+		// Only apply border radius if it has been explicitly set
+		if ( $border_radius !== '' && AJL_Settings::setting_exists( $form_id, 'border_radius' ) ) {
 			$config['appearance']['variables']['borderRadius'] = $border_radius . 'px';
-            
+
             // Add explicit border radius for select elements
             $config['appearance']['rules']['.p-Select-select']['borderRadius'] = $border_radius . 'px';
 		}
@@ -194,7 +195,7 @@ class AJL_Frontend {
 			$config['appearance']['rules']['.Input']['fontSize'] = $input_font_size . 'px';
             $config['appearance']['rules']['.CodeInput']['fontSize'] = $input_font_size . 'px';
             $config['appearance']['rules']['.PickerItem']['fontSize'] = $input_font_size . 'px';
-            
+
             // Add font size for select elements
             $config['appearance']['rules']['.p-Select-select']['fontSize'] = $input_font_size . 'px';
             $config['appearance']['rules']['.p-Select-option']['fontSize'] = $input_font_size . 'px';
@@ -239,19 +240,6 @@ class AJL_Frontend {
 
 		$css = "";
 		$preview_css = ""; // Separate CSS for preview wrapper
-		
-		// Add global button reset for all forms to override WP Simple Pay defaults
-		$css .= "
-		/* Reset button border radius to 0px by default to override WP Simple Pay's 4px default */
-		body .simpay-form-wrap .simpay-payment-btn,
-		body .simpay-form .simpay-checkout-btn,
-		body .simpay-form .simpay-apply-coupon,
-		body .simpay-form button.simpay-payment-btn,
-		body .simpay-form button.simpay-checkout-btn,
-		body .simpay-form button.simpay-apply-coupon {
-			border-radius: 0px !important;
-		}
-		";
 
 		foreach ( self::$rendered_form_ids as $form_id ) {
 			$display_type = get_post_meta( $form_id, '_form_display_type', true );
@@ -328,7 +316,7 @@ class AJL_Frontend {
 		#simpay-embedded-form-wrap-{$form_id} {
 			max-width: none !important;
 		}";
-		
+
 		// Now add the theme-specific styles
 		// Add form container background color
 		$form_bg_color = AJL_Settings::get_setting( $form_id, 'form_container_background_color' );
@@ -342,7 +330,7 @@ class AJL_Frontend {
 		if ( ! empty( $bg_color ) ) {
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { background-color: {$bg_color} !important; }\n";
 			$css .= "#simpay-form-{$form_id} .simpay-form-control { background-color: {$bg_color} !important; }\n";
-			
+
 			// Target Stripe Elements inputs including selects
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input { background-color: {$bg_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement select.Input { background-color: {$bg_color} !important; }\n";
@@ -357,7 +345,7 @@ class AJL_Frontend {
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { color: {$text_color} !important; }\n";
 			$css .= "#simpay-form-{$form_id} { color: {$text_color} !important; }\n";
 			$css .= "#simpay-form-{$form_id} .simpay-form-control { color: {$text_color} !important; }\n";
-			
+
 			// Target Stripe Elements text colors - including dropdowns, inputs and labels
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input { color: {$text_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement select.Input { color: {$text_color} !important; }\n";
@@ -366,7 +354,7 @@ class AJL_Frontend {
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement input { color: {$text_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement option { color: {$text_color} !important; }\n";
 		}
-		
+
 		// Add label text color (overrides text color for labels)
 		$label_text_color = AJL_Settings::get_setting( $form_id, 'label_text_color' );
 		if ( ! empty( $label_text_color ) ) {
@@ -376,7 +364,7 @@ class AJL_Frontend {
 			$css .= "#simpay-form-{$form_id} .simpay-label { color: {$label_text_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Label { color: {$label_text_color} !important; }\n";
 		}
-		
+
 		// Add input text color (overrides text color for inputs)
 		$input_text_color = AJL_Settings::get_setting( $form_id, 'input_text_color' );
 		if ( ! empty( $input_text_color ) ) {
@@ -402,7 +390,7 @@ class AJL_Frontend {
 		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] input:not([type='submit']) { border-color: {$border_color} !important; }\n";
 		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] select { border-color: {$border_color} !important; }\n";
 		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] textarea { border-color: {$border_color} !important; }\n";
-		    
+
 		    // Add specific style for Stripe elements
 		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement { border-color: {$border_color} !important; }\n";
 		    $css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input { box-shadow: 0 0 0 1px {$border_color}, 0 1px 2px rgba(0, 0, 0, 0.05) !important; }\n";
@@ -416,37 +404,38 @@ class AJL_Frontend {
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] a { color: {$primary_color} !important; }\n";
 			$css .= "#simpay-form-{$form_id} .simpay-form-control:focus { border-color: {$primary_color} !important; }\n";
 			$css .= "#simpay-form-{$form_id} a { color: {$primary_color} !important; }\n";
-			
+
 			// Target Stripe Elements focus states
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input:focus { border-color: {$primary_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement select.Input:focus { border-color: {$primary_color} !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .p-Select-select:focus { border-color: {$primary_color} !important; }\n";
 		}
 
-		// Add border radius - ALWAYS set button border radius to ensure we override WP Simple Pay defaults
-		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', 0 );
-		
-		// For form controls
-		if ( '' !== $border_radius ) {
+		// Add border radius only if it has been explicitly set
+		$border_radius = AJL_Settings::get_setting( $form_id, 'border_radius', '' );
+
+		// Only apply border radius styles if a value has been explicitly set
+		if ( '' !== $border_radius && AJL_Settings::setting_exists( $form_id, 'border_radius' ) ) {
+			// For form controls
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-form-control { border-radius: {$border_radius}px !important; }\n";
 			$css .= "#simpay-form-{$form_id} .simpay-form-control { border-radius: {$border_radius}px !important; }\n";
-			
+
 			// Target Stripe Elements border radius
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .Input { border-radius: {$border_radius}px !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement select.Input { border-radius: {$border_radius}px !important; }\n";
 			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .StripeElement .p-Select-select { border-radius: {$border_radius}px !important; }\n";
-		}
-		
-		// Always explicitly set button border radius to override WP Simple Pay's default 4px
-		$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
-		$css .= "#simpay-form-{$form_id} .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
-		$css .= "#simpay-form-{$form_id} .simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
-		$css .= "#simpay-form-{$form_id} .simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
 
-		// Target the buttons with higher specificity to override WP Simple Pay defaults
-		$css .= "body .simpay-form-wrap[data-form-id=\"{$form_id}\"] button.simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
-		$css .= "body #simpay-form-{$form_id} button.simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
-		$css .= "body #simpay-form-{$form_id} button.simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
+			// Apply to buttons only if border radius has been explicitly set
+			$css .= ".simpay-form-wrap[data-form-id=\"{$form_id}\"] .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
+			$css .= "#simpay-form-{$form_id} .simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
+
+			// Target the buttons with higher specificity to override WP Simple Pay defaults
+			$css .= "body .simpay-form-wrap[data-form-id=\"{$form_id}\"] button.simpay-payment-btn { border-radius: {$border_radius}px !important; }\n";
+			$css .= "body #simpay-form-{$form_id} button.simpay-checkout-btn { border-radius: {$border_radius}px !important; }\n";
+			$css .= "body #simpay-form-{$form_id} button.simpay-apply-coupon { border-radius: {$border_radius}px !important; }\n";
+		}
 
 		// Add button background color
 		$button_bg_color = AJL_Settings::get_setting( $form_id, 'button_background_color', '#0f8569' );

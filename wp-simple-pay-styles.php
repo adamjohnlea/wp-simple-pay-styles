@@ -40,11 +40,11 @@ function ajl_wpsps_init() {
         return;
     }
 	// Check if WP Simple Pay version is sufficient (Requires UPE/Elements features)
-    // Minimum version check might be needed here depending on hooks used. For now, let's assume recent enough.
-    // if ( defined( 'SIMPLE_PAY_VERSION' ) && version_compare( SIMPLE_PAY_VERSION, '4.7.0', '<' ) ) {
-    //     add_action( 'admin_notices', 'ajl_wpsps_admin_notice_wpsp_version' );
-    //     return;
-    // }
+    // Minimum version check is needed for the Elements Appearance API filter
+    if ( defined( 'SIMPLE_PAY_VERSION' ) && version_compare( SIMPLE_PAY_VERSION, '4.7.0', '<' ) ) {
+        add_action( 'admin_notices', 'ajl_wpsps_admin_notice_wpsp_version' );
+        return;
+    }
 
 
 	AJL_WP_Simple_Pay_Styles\AJL_Styler::get_instance();
@@ -62,4 +62,13 @@ function ajl_wpsps_admin_notice_missing_wpsp() {
 	<?php
 }
 
-// Removed the commented-out ajl_wpsps_admin_notice_wpsp_version function entirely. 
+/**
+ * Admin notice if WP Simple Pay version is insufficient.
+ */
+function ajl_wpsps_admin_notice_wpsp_version() {
+	?>
+	<div class="notice notice-error is-dismissible">
+		<p><?php esc_html_e( 'WP Simple Pay Styles requires WP Simple Pay version 4.7.0 or later. Please update WP Simple Pay to use this plugin.', 'ajl-wp-simple-pay-styles' ); ?></p>
+	</div>
+	<?php
+}

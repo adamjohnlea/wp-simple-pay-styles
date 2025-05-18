@@ -4,6 +4,11 @@
  * Modern tabbed interface for the WP Simple Pay Styles settings panel.
  */
 
+/* Section Headings */
+.simpay-panel h3 {
+    margin-left: 12px;
+}
+
 /* Main Container */
 .ajl-wpsps-tabs-container {
     background: #fff;
@@ -218,11 +223,11 @@
     .ajl-wpsps-form-grid {
         display: block;
     }
-    
+
     .ajl-wpsps-tabs-nav {
         flex-wrap: wrap;
     }
-    
+
     .ajl-wpsps-tab-button {
         flex: 1;
         text-align: center;
