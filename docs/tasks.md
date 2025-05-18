@@ -5,7 +5,7 @@ This document contains a comprehensive list of improvement tasks for the WP Simp
 ## Code Structure and Organization
 
 1. [x] Implement proper WordPress coding standards throughout the codebase using PHPCS with WordPress-Extra ruleset
-2. [ ] Add proper PHPDoc comments to all classes and methods, including `@since` tags
+2. [x] Add proper PHPDoc comments to all classes and methods, including `@since` tags
 3. [ ] Create a proper uninstall.php file to clean up plugin data on uninstallation
 4. [ ] Implement a proper activation hook to set up initial plugin data
 5. [ ] Implement a proper deactivation hook to clean up temporary data

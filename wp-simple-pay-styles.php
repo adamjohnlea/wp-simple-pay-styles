@@ -10,6 +10,10 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-simple-pay-styles
  * Domain Path:       /languages
+ *
+ * @package AJL_WP_Simple_Pay_Styles
+ * @author  Your Name Here
+ * @version 1.0.0
  */
 
 // Exit if accessed directly.
@@ -18,7 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Define constants.
+ * Define plugin constants.
+ *
+ * @since 1.0.0
  */
 define( 'AJL_WPSPS_BASENAME', plugin_basename( __FILE__ ) );
 define( 'AJL_WPSPS_VERSION', '1.0.0' );
@@ -27,11 +33,20 @@ define( 'AJL_WPSPS_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * Load the main plugin class.
+ *
+ * @since 1.0.0
  */
 require_once AJL_WPSPS_PATH . 'includes/class-ajl-styler.php';
 
 /**
  * Initialize the plugin.
+ *
+ * Checks if WP Simple Pay is active and if the version is sufficient.
+ * If all requirements are met, initializes the plugin.
+ *
+ * @since 1.0.0
+ *
+ * @return void
  */
 function ajl_wpsps_init() {
     // Check if WP Simple Pay Pro is active
@@ -53,6 +68,13 @@ add_action( 'plugins_loaded', 'ajl_wpsps_init' );
 
 /**
  * Admin notice if WP Simple Pay is missing.
+ *
+ * Displays an admin notice informing the user that WP Simple Pay
+ * is required for this plugin to function.
+ *
+ * @since 1.0.0
+ *
+ * @return void
  */
 function ajl_wpsps_admin_notice_missing_wpsp() {
 	?>
@@ -64,6 +86,13 @@ function ajl_wpsps_admin_notice_missing_wpsp() {
 
 /**
  * Admin notice if WP Simple Pay version is insufficient.
+ *
+ * Displays an admin notice informing the user that a newer version
+ * of WP Simple Pay is required for this plugin to function properly.
+ *
+ * @since 1.0.0
+ *
+ * @return void
  */
 function ajl_wpsps_admin_notice_wpsp_version() {
 	?>

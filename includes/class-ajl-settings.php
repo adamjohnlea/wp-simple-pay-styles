@@ -14,6 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Settings handler class.
+ *
+ * Handles getting, setting, and managing style meta values for forms.
+ * Provides methods for retrieving, saving, and deleting style settings,
+ * as well as checking if settings exist and sanitizing values.
+ *
+ * @since 1.0.0
  */
 class AJL_Settings {
 
@@ -111,11 +117,16 @@ class AJL_Settings {
 		return update_post_meta( $form_id, $meta_key, $value );
 	}
 
-	/**
-	 * Get all style setting keys.
-	 *
-	 * @return array Array of style setting keys.
-	 */
+ /**
+  * Get all style setting keys.
+  *
+  * Returns an array of all available style setting keys that can be
+  * used with get_setting() and save_setting() methods.
+  *
+  * @since 1.0.0
+  *
+  * @return array Array of style setting keys.
+  */
 	public static function get_style_keys() {
 		return [
 			'selected_theme',
@@ -136,35 +147,48 @@ class AJL_Settings {
 		];
 	}
 
-	/**
-	 * Delete a specific style setting for a post.
-	 *
-	 * @param int    $post_id The post ID.
-	 * @param string $key     The setting key (without prefix).
-	 */
+ /**
+  * Delete a specific style setting for a post.
+  *
+  * Removes a style setting from the database for the specified post.
+  *
+  * @since 1.0.0
+  *
+  * @param int    $post_id The post ID.
+  * @param string $key     The setting key (without prefix).
+  * @return void
+  */
 	public static function delete_setting( $post_id, $key ) {
 		delete_post_meta( $post_id, self::$meta_prefix . sanitize_key( $key ) );
 	}
 
-	/**
-	 * Check if a specific style setting exists for a post.
-	 *
-	 * @param int    $post_id The post ID.
-	 * @param string $key     The setting key (without prefix).
-	 * @return bool True if the meta key exists, false otherwise.
-	 */
+ /**
+  * Check if a specific style setting exists for a post.
+  *
+  * Determines if a style setting has been saved for the specified post.
+  *
+  * @since 1.0.0
+  *
+  * @param int    $post_id The post ID.
+  * @param string $key     The setting key (without prefix).
+  * @return bool True if the meta key exists, false otherwise.
+  */
 	public static function setting_exists( $post_id, $key ) {
 		return metadata_exists( 'post', $post_id, self::$meta_prefix . sanitize_key( $key ) );
 	}
 
-	/**
-	 * Sanitize a setting value.
-	 *
-	 * @param string $key   Setting key.
-	 * @param mixed  $value Setting value.
-	 *
-	 * @return mixed Sanitized setting value.
-	 */
+ /**
+  * Sanitize a setting value.
+  *
+  * Sanitizes a setting value based on its key to ensure data integrity
+  * and security before use.
+  *
+  * @since 1.0.0
+  *
+  * @param string $key   Setting key.
+  * @param mixed  $value Setting value.
+  * @return mixed Sanitized setting value.
+  */
 	public static function sanitize_setting( $key, $value ) {
 		switch ( $key ) {
 			case 'selected_theme':

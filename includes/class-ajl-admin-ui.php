@@ -13,6 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Class AJL_Admin_UI
+ *
+ * Handles the admin user interface for WP Simple Pay Styles.
+ * Adds style settings to the WP Simple Pay form editor and handles
+ * saving and retrieving style settings.
+ *
+ * @since 1.0.0
  */
 class AJL_Admin_UI {
 
@@ -68,11 +74,17 @@ class AJL_Admin_UI {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
 	}
 
-	/**
-	 * Enqueue admin scripts and styles (like the color picker).
-	 *
-	 * @param string $hook_suffix The current admin page.
-	 */
+ /**
+  * Enqueue admin scripts and styles (like the color picker).
+  *
+  * Loads necessary CSS and JavaScript files for the admin interface,
+  * but only on the WP Simple Pay form edit screen.
+  *
+  * @since 1.0.0
+  *
+  * @param string $hook_suffix The current admin page.
+  * @return void
+  */
 	public function enqueue_admin_scripts( $hook_suffix ) {
 		global $post_type;
 
@@ -81,7 +93,7 @@ class AJL_Admin_UI {
 			// Enqueue WordPress color picker scripts and styles.
 			wp_enqueue_style( 'wp-color-picker' );
 			wp_enqueue_script( 'wp-color-picker' );
-			
+
 			// Enqueue color picker alpha addon if available
 			if ( ! wp_script_is( 'wp-color-picker-alpha', 'registered' ) ) {
 				wp_register_script(
@@ -93,7 +105,7 @@ class AJL_Admin_UI {
 				);
 			}
 			wp_enqueue_script( 'wp-color-picker-alpha' );
-			
+
 			// Enqueue custom admin styles and scripts
 			wp_enqueue_style( 
 				'ajl-wpsps-admin-css', 
@@ -101,7 +113,7 @@ class AJL_Admin_UI {
 				[], 
 				AJL_WPSPS_VERSION 
 			);
-			
+
 			wp_enqueue_script( 
 				'ajl-wpsps-admin-js', 
 				AJL_WPSPS_URL . 'assets/js/ajl-admin.js', 
@@ -124,12 +136,18 @@ class AJL_Admin_UI {
 		}
 	}
 
-	/**
-	 * Check if this is a new form without any saved style settings
-	 *
-	 * @param int $post_id The post ID to check
-	 * @return bool True if this is a new form, false otherwise
-	 */
+ /**
+  * Check if this is a new form without any saved style settings
+  *
+  * Determines if a form has any style settings saved yet.
+  * Used to apply default styles to new forms.
+  *
+  * @since 1.0.0
+  * @access private
+  *
+  * @param int $post_id The post ID to check
+  * @return bool True if this is a new form, false otherwise
+  */
 	private function is_new_form( $post_id ) {
 		// Check if any style settings exist for this form
 		foreach ( AJL_Settings::get_style_keys() as $key ) {
@@ -137,15 +155,21 @@ class AJL_Admin_UI {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
-	/**
-	 * Renders the style settings within the WP Simple Pay 'General' tab.
-	 *
-	 * @param int $post_id The post ID.
-	 */
+ /**
+  * Renders the style settings within the WP Simple Pay 'General' tab.
+  *
+  * Creates the tabbed interface for style settings in the form editor.
+  * Includes tabs for themes, colors, typography, layout, and buttons.
+  *
+  * @since 1.0.0
+  *
+  * @param int $post_id The post ID.
+  * @return void
+  */
 	public function render_style_settings_in_tab( $post_id ) {
 
 		// Check if the form type is on-site (embedded or overlay)
@@ -166,7 +190,7 @@ class AJL_Admin_UI {
 		wp_nonce_field( 'ajl_wpsps_save_styles', 'ajl_wpsps_styles_nonce' );
 
 		$style_keys = AJL_Settings::get_style_keys();
-		
+
 		// Start the modern tabbed interface
 		?>
 		<div class="ajl-wpsps-tabs-container">
@@ -202,7 +226,7 @@ class AJL_Admin_UI {
 						<?php
 						// Get the current selected theme
 						$current_theme = AJL_Settings::get_setting( $post_id, 'selected_theme', 'default' );
-						
+
 						// Define theme presets
 						$themes = [
 							'default' => [
@@ -306,10 +330,10 @@ class AJL_Admin_UI {
 								'description' => __( 'Clean, minimalist design', 'ajl-wp-simple-pay-styles' ),
 							],
 						];
-						
+
 						// Store themes in a hidden field for JavaScript access
 						echo '<input type="hidden" id="ajl_wpsps_theme_presets" value="' . esc_attr( json_encode( $themes ) ) . '">';
-						
+
 						// Output theme selection cards
 						foreach ( $themes as $theme_id => $theme ) {
 							$is_selected = $current_theme === $theme_id;
@@ -544,7 +568,7 @@ class AJL_Admin_UI {
 									'800' => '800 (Extra Bold)',
 									'900' => '900 (Black)',
 								];
-								
+
 								foreach ( $weight_options as $value => $label ) {
 									printf(
 										'<option value="%s" %s>%s</option>',
@@ -685,12 +709,18 @@ class AJL_Admin_UI {
 	}
 
 
-	/**
-	 * Saves the style settings data when the post is saved.
-	 *
-	 * @param int     $post_id The post ID.
-	 * @param WP_Post $post    The post object.
-	 */
+ /**
+  * Saves the style settings data when the post is saved.
+  *
+  * Handles validation, sanitization, and saving of style settings
+  * when a WP Simple Pay form is saved.
+  *
+  * @since 1.0.0
+  *
+  * @param int     $post_id The post ID.
+  * @param WP_Post $post    The post object.
+  * @return void
+  */
 	public function save_style_settings( $post_id, $post ) {
 		// Check if our nonce is set.
 		if ( ! isset( $_POST['ajl_wpsps_styles_nonce'] ) ) {
@@ -723,7 +753,7 @@ class AJL_Admin_UI {
 
 		// Check if reset action was triggered
 		$is_reset = isset( $_POST['ajl_wpsps_reset'] ) && $_POST['ajl_wpsps_reset'] === 'true';
-		
+
 		if ( $is_reset ) {
 			// Delete all style settings if reset was requested
 			$style_keys = AJL_Settings::get_style_keys();
@@ -783,9 +813,16 @@ class AJL_Admin_UI {
 		}
 	}
 
-	/**
-	 * Render style settings tab template.
-	 */
+ /**
+  * Render style settings tab template.
+  *
+  * Creates the HTML template for the style settings tab.
+  * This is a legacy method and may not be used in current versions.
+  *
+  * @since 1.0.0
+  *
+  * @return string The HTML template.
+  */
 	public function get_style_settings_tab_template() {
 		ob_start();
 		?>

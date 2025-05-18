@@ -14,6 +14,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Frontend handler class.
+ *
+ * Handles frontend filtering and style application for WP Simple Pay forms.
+ * Modifies Stripe Elements configuration and generates custom CSS for forms.
+ *
+ * @since 1.0.0
  */
 class AJL_Frontend {
 
@@ -25,18 +30,24 @@ class AJL_Frontend {
 	 */
 	private static $instance = null;
 
-	/**
-	 * Stores the IDs of forms rendered on the current page.
-	 *
-	 * @var array<int>
-	 */
+ /**
+  * Stores the IDs of forms rendered on the current page.
+  *
+  * @since 1.0.0
+  * @var array<int>
+  */
 	private static $rendered_form_ids = [];
 
-	/**
-	 * Get the singleton instance.
-	 *
-	 * @return AJL_Frontend
-	 */
+ /**
+  * Get the singleton instance.
+  *
+  * Ensures only one instance of AJL_Frontend is loaded or can be loaded.
+  *
+  * @since 1.0.0
+  * @static
+  *
+  * @return AJL_Frontend The single instance of this class.
+  */
 	public static function get_instance() {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
@@ -44,9 +55,14 @@ class AJL_Frontend {
 		return self::$instance;
 	}
 
-	/**
-	 * Constructor.
-	 */
+ /**
+  * Constructor.
+  *
+  * Initializes the class and sets up hooks.
+  *
+  * @since 1.0.0
+  * @access private
+  */
 	private function __construct() {
 		$this->hooks();
 	}
@@ -68,12 +84,17 @@ class AJL_Frontend {
 		add_action( 'wp_print_footer_scripts', [ $this, 'print_late_frontend_styles' ], 100 ); // Using a late hook
 	}
 
-	/**
-	 * Filters the Stripe Elements configuration array based on saved settings.
-	 *
-	 * @param array $config The original Elements configuration.
-	 * @return array The modified Elements configuration.
-	 */
+ /**
+  * Filters the Stripe Elements configuration array based on saved settings.
+  *
+  * Modifies the Stripe Elements appearance configuration to apply custom styles
+  * based on the saved settings for the current form.
+  *
+  * @since 1.0.0
+  *
+  * @param array $config The original Elements configuration.
+  * @return array The modified Elements configuration.
+  */
 	public function modify_elements_config( $config ) {
 		// Try to get the relevant form ID from the rendered list.
         if ( empty( self::$rendered_form_ids ) ) {
@@ -218,11 +239,16 @@ class AJL_Frontend {
 		return $config;
 	}
 
-	/**
-	 * Capture the ID of a form being rendered on the page.
-	 *
-	 * @param int $form_id The ID of the form being rendered.
-	 */
+ /**
+  * Capture the ID of a form being rendered on the page.
+  *
+  * Stores the form ID in a static array to be used later for styling.
+  *
+  * @since 1.0.0
+  *
+  * @param int $form_id The ID of the form being rendered.
+  * @return void
+  */
 	public function capture_rendered_form_id( $form_id ) {
 		$form_id = absint( $form_id );
 		if ( $form_id > 0 && ! in_array( $form_id, self::$rendered_form_ids, true ) ) {
@@ -230,9 +256,16 @@ class AJL_Frontend {
 		}
 	}
 
-	/**
-	 * Prints inline CSS late in the footer for non-Elements form parts.
-	 */
+ /**
+  * Prints inline CSS late in the footer for non-Elements form parts.
+  *
+  * Generates and outputs custom CSS for all rendered forms on the current page.
+  * This CSS targets non-Stripe Elements parts of the form.
+  *
+  * @since 1.0.0
+  *
+  * @return void
+  */
 	public function print_late_frontend_styles() {
 		if ( empty( self::$rendered_form_ids ) ) {
 			return;
@@ -283,6 +316,16 @@ class AJL_Frontend {
 
     /**
      * Helper function to convert hex color to rgba.
+     *
+     * Converts a hexadecimal color value to an rgba color value with the specified opacity.
+     *
+     * @since 1.0.0
+     * @access private
+     * @static
+     *
+     * @param string $color   The hexadecimal color value.
+     * @param float  $opacity The opacity value (0-1).
+     * @return string The rgba color value.
      */
     private static function hex_to_rgba( $color, $opacity = 1 ) {
         $color = ltrim( $color, '#' );
@@ -301,12 +344,18 @@ class AJL_Frontend {
         return sprintf( 'rgba(%d,%d,%d,%.2f)', $r, $g, $b, $opacity );
     }
 
-	/**
-	 * Generate the custom CSS for a form based on its style settings.
-	 *
-	 * @param int $form_id The form ID.
-	 * @return string The generated CSS.
-	 */
+ /**
+  * Generate the custom CSS for a form based on its style settings.
+  *
+  * Creates CSS rules for a specific form based on its saved style settings.
+  * This CSS targets standard HTML elements that are not controlled by Stripe Elements.
+  *
+  * @since 1.0.0
+  * @access private
+  *
+  * @param int $form_id The form ID.
+  * @return string The generated CSS.
+  */
 	private function generate_custom_css( $form_id ) {
 		$css = '';
 
